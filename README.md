@@ -3,7 +3,7 @@
 ![Build](https://github.com/grasp-labs/ds-go-commonmodels/actions/workflows/ci.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/grasp-labs/ds-go-commonmodels)](https://goreportcard.com/report/github.com/grasp-labs/ds-go-commonmodels)
 [![codecov](https://codecov.io/gh/grasp-labs/ds-go-commonmodels/branch/main/graph/badge.svg)](https://codecov.io/gh/grasp-labs/ds-go-commonmodels)
-[![GitHub release](https://img.shields.io/github/v/release/grasp-labs/ds-go-commonmodels)](https://github.com/grasp-labs/ds-go-commonmodels/releases)
+[![Latest tag](https://img.shields.io/github/v/tag/grasp-labs/ds-go-commonmodels?sort=semver)](https://github.com/grasp-labs/ds-go-commonmodels/tags)
 ![License](https://img.shields.io/github/license/grasp-labs/ds-go-commonmodels?cacheSeconds=60)
 
 A small, focused set of Go models and helpers intended for API services on Grasp Data platform (GraspDP).
