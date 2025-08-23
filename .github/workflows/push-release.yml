@@ -14,7 +14,7 @@ jobs:
       DOMAIN: ds
       SERVICE_GROUP: packages
       SERVICE_NAME: go-commonmodels
-      ACCOUNT_ID: 999125116186
+      ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
     steps:
       - name: Checkout code
