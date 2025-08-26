@@ -77,7 +77,7 @@ func (e *Event) Validate() ValidationErrors {
 	if e.Body == nil {
 		bodyEmpty = true
 	} else {
-		bodyEmpty = len(e.Body.Data) == 0
+		bodyEmpty = e.Body.Empty()
 	}
 	bodyURINilOrEmpty := e.BodyURI == nil || strings.TrimSpace(*e.BodyURI) == ""
 	if bodyEmpty && bodyURINilOrEmpty {
