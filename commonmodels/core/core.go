@@ -62,49 +62,49 @@ type CoreModel struct {
 func (b *CoreModel) Validate() ValidationErrors {
 	var errs ValidationErrors
 
+	// local function helper creating and appending errors.
+	req := func(field, msg string) { errs = append(errs, verr.ValidationError{Field: field, Message: msg}) }
+
 	if b.ID == uuid.Nil {
-		errs = append(errs, verr.ValidationError{Field: "id", Message: "required"})
+		req("id", "required")
 	}
 	if b.TenantID == uuid.Nil {
-		errs = append(errs, verr.ValidationError{Field: "tenant_id", Message: "required"})
+		req("tenant_id", "required")
 	}
 	if b.Name == "" {
-		errs = append(errs, verr.ValidationError{Field: "name", Message: "required"})
+		req("name", "required")
 	}
 	if b.CreatedBy == "" {
-		errs = append(errs, verr.ValidationError{Field: "created_by", Message: "required"})
+		req("created_by", "required")
 	}
 	if !email.IsEmailFormat(b.CreatedBy) {
-		errs = append(errs, verr.ValidationError{Field: "created_by", Message: "not a valid email format"})
+		req("created_by", "not a valid email format")
 	}
 	if b.ModifiedBy == "" {
-		errs = append(errs, verr.ValidationError{Field: "modified_by", Message: "required"})
+		req("modified_by", "required")
 	}
 	if !email.IsEmailFormat(b.ModifiedBy) {
-		errs = append(errs, verr.ValidationError{Field: "modified_by", Message: "not a valid email format"})
+		req("modified_by", "not a valid email format")
 	}
 	if b.CreatedAt.IsZero() {
-		errs = append(errs, verr.ValidationError{Field: "created_at", Message: "required"})
+		req("created_at", "required")
 	}
 	if b.ModifiedAt.IsZero() {
-		errs = append(errs, verr.ValidationError{Field: "modified_at", Message: "required"})
+		req("modified_at", "required")
 	}
 
 	switch b.Status {
 	case status.Active, status.Deleted, status.Suspended, status.Rejected, status.Draft:
 		// ok
 	default:
-		errs = append(errs, verr.ValidationError{
-			Field:   "status",
-			Message: fmt.Sprintf("invalid %q; expected one of active, deleted, suspended, rejected, draft", b.Status),
-		})
+		req("status", fmt.Sprintf("invalid %q; expected one of active, deleted, suspended, rejected, draft", b.Status))
 	}
 
 	if err := b.Metadata.Validate(); err != nil {
-		errs = append(errs, verr.ValidationError{Field: "metadata", Message: "invalid JSON structure"})
+		req("metadata", "invalid JSON structure")
 	}
 	if err := b.Tags.Validate(); err != nil {
-		errs = append(errs, verr.ValidationError{Field: "tags", Message: "invalid JSON structure"})
+		req("tags", "invalid JSON structure")
 	}
 
 	return errs

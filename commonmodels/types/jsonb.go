@@ -4,11 +4,45 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"reflect"
 )
 
 // JSONB wraps any Go type T and tells GORM to persist it as Postgres JSONB.
 type JSONB[T any] struct {
 	Data T
+}
+
+// Empty reports whether Data is "empty":
+//   - nil pointer/interface
+//   - zero-length map/slice/array/string
+//   - zero-value struct or scalar
+func (j JSONB[T]) Empty() bool {
+	return isEmpty(j.Data)
+}
+
+func isEmpty(v any) bool {
+	if v == nil {
+		return true
+	}
+	rv := reflect.ValueOf(v)
+
+	// Unwrap pointers/interfaces
+	for rv.Kind() == reflect.Pointer || rv.Kind() == reflect.Interface {
+		if rv.IsNil() {
+			return true
+		}
+		rv = rv.Elem()
+	}
+
+	switch rv.Kind() {
+	case reflect.Map, reflect.Slice, reflect.Array, reflect.String:
+		return rv.Len() == 0
+	case reflect.Struct:
+		return rv.IsZero()
+	default:
+		// zero for numbers/bools/etc.
+		return rv.IsZero()
+	}
 }
 
 // Validate returns an error if Data can’t round-trip to JSON.
