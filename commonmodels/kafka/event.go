@@ -73,7 +73,12 @@ func (e *Event) Validate() ValidationErrors {
 	}
 
 	// body/body_uri rule: require at least one non-empty; optionally forbid both
-	bodyEmpty := e.Body == nil || len(e.Body.Data) == 0
+	var bodyEmpty bool
+	if e.Body == nil {
+		bodyEmpty = true
+	} else {
+		bodyEmpty = len(e.Body.Data) == 0
+	}
 	bodyURINilOrEmpty := e.BodyURI == nil || strings.TrimSpace(*e.BodyURI) == ""
 	if bodyEmpty && bodyURINilOrEmpty {
 		req("body", "body and body_uri cannot both be empty")
