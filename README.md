@@ -23,6 +23,10 @@ Model has Gorm support and implement the following Gorm hooks:
 - `BeforeCreate`: Applied safe defaults and validate/normalize metadata.
 - `BeforeUpdate`: Refresh modification audit fields.
 
+### Kafka - our event message model
+
+Kafka model define requirement of sending messages in general.
+
 ## Install
 
 Latest

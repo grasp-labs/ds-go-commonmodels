@@ -1,0 +1,65 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://grasp-labs.com/schemas/events/event.json",
+    "title": "Event",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id":                { "type": "string", "format": "uuid" },
+      "session_id":        { "type": "string", "format": "uuid" },
+      "request_id":        { "type": "string", "format": "uuid" },
+      "tenant_id":         { "type": "string", "format": "uuid" },
+      "owner_id":          { "type": "string", "minLength": 1 },
+  
+      "event_type":        { "type": "string", "minLength": 1 },
+      "event_source":      { "type": "string", "minLength": 1 },
+  
+      "event_source_uri":    { "type": "string", "format": "uri" },
+      "affected_entity_uri": { "type": "string", "format": "uri" },
+  
+      "message":           { "type": "string" },
+  
+      "body": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      },
+      "body_uri": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "\\\\S"
+      },
+  
+      "metadata": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+  
+      "tags": {
+        "type": "object",
+        "additionalProperties": true
+      },
+  
+      "timestamp":        { "type": "string", "format": "date-time" },
+      "created_by":       { "type": "string", "format": "email" },
+      "md5_hash":         { "type": "string", "pattern": "^[A-Fa-f0-9]{32}$" }
+    },
+    "required": [
+      "id",
+      "session_id",
+      "request_id",
+      "tenant_id",
+      "event_type",
+      "event_source",
+      "timestamp",
+      "created_by",
+      "md5_hash"
+    ],
+    "anyOf": [
+      { "required": ["body"] },
+      { "required": ["body_uri"] }
+    ]
+  }
