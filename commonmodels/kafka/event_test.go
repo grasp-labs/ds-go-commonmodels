@@ -28,7 +28,7 @@ func newValidEvent() events.Event {
 		Body:              &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
 		BodyURI:           nil,
 		Metadata:          types.JSONB[[]map[string]string]{Data: []map[string]string{{"m": "1"}}},
-		Tags:              types.JSONB[map[string]any]{Data: map[string]any{"env": "test"}},
+		Tags:              types.JSONB[map[string]string]{Data: map[string]string{"env": "test"}},
 		Timestamp:         time.Now().UTC(),
 		CreatedBy:         "dev@example.com",
 		MD5Hash:           validMD5(),
@@ -140,15 +140,10 @@ func TestEventValidate_JSONBStructureErrors(t *testing.T) {
 	ev.Body = &types.JSONB[map[string]any]{Data: map[string]any{"bad": ch}}
 	// Provide BodyURI so presence rule isn't tripped
 	ev.BodyURI = strp("https://example.com/payload")
-	// Make Tags invalid too
-	ev.Tags = types.JSONB[map[string]any]{Data: map[string]any{"also_bad": ch}}
 
 	errs := ev.Validate()
 	if !hasErr(errs, "body", "invalid JSON structure") {
 		t.Errorf("expected body invalid JSON structure, got: %+v", errs)
-	}
-	if !hasErr(errs, "tags", "invalid JSON structure") {
-		t.Errorf("expected tags invalid JSON structure, got: %+v", errs)
 	}
 }
 

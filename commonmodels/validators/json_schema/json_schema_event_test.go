@@ -99,7 +99,7 @@ func newValidEvent() events.Event {
 		Body:              &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
 		BodyURI:           nil,
 		Metadata:          types.JSONB[[]map[string]string]{Data: []map[string]string{{"key": "value"}}},
-		Tags:              types.JSONB[map[string]any]{Data: map[string]any{"env": "test"}},
+		Tags:              types.JSONB[map[string]string]{Data: map[string]string{"env": "test"}},
 		Timestamp:         time.Now().UTC(),
 		CreatedBy:         "dev@example.com",
 		MD5Hash:           validMD5(),
