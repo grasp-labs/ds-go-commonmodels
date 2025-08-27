@@ -35,12 +35,12 @@ var EventJSONSchema = []byte(`
   
       "message":           { "type": "string" },
   
-      "body": {
+      "payload": {
         "type": "object",
         "minProperties": 1,
         "additionalProperties": true
       },
-      "body_uri": {
+      "payload_uri": {
         "type": "string",
         "format": "uri",
         "pattern": "\\\\S"
@@ -58,7 +58,17 @@ var EventJSONSchema = []byte(`
   
       "timestamp":        { "type": "string", "format": "date-time" },
       "created_by":       { "type": "string", "format": "email" },
-      "md5_hash":         { "type": "string", "pattern": "^[A-Fa-f0-9]{32}$" }
+      "md5_hash":         { "type": "string", "pattern": "^[A-Fa-f0-9]{32}$" },
+	  "context": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      },
+	  "context_uri": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "\\\\S"
+      }
     },
     "required": [
       "id",
@@ -72,8 +82,8 @@ var EventJSONSchema = []byte(`
       "md5_hash"
     ],
     "anyOf": [
-      { "required": ["body"] },
-      { "required": ["body_uri"] }
+      { "required": ["payload"] },
+      { "required": ["payload_uri"] }
     ]
   }
 `)
@@ -93,13 +103,15 @@ func newValidEvent() events.Event {
 		EventSourceURI:    strp("https://example.com/source"),
 		AffectedEntityURI: strp("https://example.com/entity"),
 		Message:           strp("hello"),
-		Body:              &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
-		BodyURI:           nil,
+		Payload:           &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
+		PayloadURI:        nil,
 		Metadata:          types.JSONB[map[string]string]{Data: map[string]string{"key": "value"}},
 		Tags:              types.JSONB[map[string]string]{Data: map[string]string{"env": "test"}},
 		Timestamp:         time.Now().UTC(),
 		CreatedBy:         "dev@example.com",
 		MD5Hash:           validMD5(),
+		Context:           nil,
+		ContextURI:        nil,
 	}
 }
 
@@ -120,10 +132,10 @@ func TestEvent_JSONSchema_Valid(t *testing.T) {
 }
 
 func TestEvent_JSONSchema_Failures(t *testing.T) {
-	t.Run("missing_body_and_body_uri", func(t *testing.T) {
+	t.Run("missing_payload_and_payload_uri", func(t *testing.T) {
 		ev := newValidEvent()
-		ev.Body = nil
-		ev.BodyURI = nil // both absent -> violates anyOf
+		ev.Payload = nil
+		ev.PayloadURI = nil // both absent -> violates anyOf
 		validationErrors := js.ValidateAgainstSchema(marshal(t, ev), EventJSONSchema)
 
 		foundF := 0
@@ -144,14 +156,14 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 
 	t.Run("empty_body_object", func(t *testing.T) {
 		ev := newValidEvent()
-		ev.Body = &types.JSONB[map[string]any]{Data: map[string]any{}} // present but empty -> minProperties:1
+		ev.Payload = &types.JSONB[map[string]any]{Data: map[string]any{}} // present but empty -> minProperties:1
 		validationErrors := js.ValidateAgainstSchema(marshal(t, ev), EventJSONSchema)
 
 		for i, e := range validationErrors {
 			switch i {
 			case 0:
-				if e.Field != "body" {
-					t.Fatalf("Expected field to be body, got %s", e.Field)
+				if e.Field != "payload" {
+					t.Fatalf("Expected field to be payload, got %s", e.Field)
 				}
 				if e.Message != "(minProperties): Must have at least 1 properties" {
 					t.Fatalf("Expected message '(minProperties): Must have at least 1 properties', got %s", e.Message)
@@ -165,13 +177,13 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 		bad := "::::not-a-uri"
 		ev.EventSourceURI = &bad
 		ev.AffectedEntityURI = &bad
-		ev.Body = nil
-		ev.BodyURI = &bad
+		ev.Payload = nil
+		ev.PayloadURI = &bad
 		validationErrors := js.ValidateAgainstSchema(marshal(t, ev), EventJSONSchema)
 		foundF := 0
 		foundM := 0
 		for _, e := range validationErrors {
-			if e.Field == "body_uri" {
+			if e.Field == "payload_uri" {
 				foundF++
 				if strings.Contains(e.Message, "pattern") || strings.Contains(e.Message, "format") {
 					foundM++
