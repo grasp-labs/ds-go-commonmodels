@@ -39,20 +39,20 @@ type ValidationErrors []verr.ValidationError
 //   - TenantID: indexed; Status+TenantID composite index for common filters.
 //   - CreatedAt/ModifiedAt: auto-populated by GORM; also set in hooks.
 type CoreModel struct {
-	ID          uuid.UUID                        `gorm:"type:uuid;primaryKey" json:"id"`
-	TenantID    uuid.UUID                        `gorm:"type:uuid" json:"tenant_id"`
-	OwnerID     string                           `json:"owner_id"`
-	Issuer      string                           `json:"issuer"`
-	Name        string                           `json:"name"`
-	Version     string                           `json:"version"`
-	Description string                           `json:"description"`
-	Status      status.Status                    `json:"status"`
-	Metadata    types.JSONB[[]map[string]string] `gorm:"column:metadata;type:jsonb" json:"metadata"`
-	Tags        types.JSONB[map[string]string]   `gorm:"column:tags;type:jsonb"     json:"tags"`
-	CreatedAt   time.Time                        `json:"created_at"`
-	ModifiedAt  time.Time                        `json:"modified_at"`
-	CreatedBy   string                           `json:"created_by"`
-	ModifiedBy  string                           `json:"modified_by"`
+	ID          uuid.UUID                      `gorm:"type:uuid;primaryKey" json:"id"`
+	TenantID    uuid.UUID                      `gorm:"type:uuid" json:"tenant_id"`
+	OwnerID     string                         `json:"owner_id"`
+	Issuer      string                         `json:"issuer"`
+	Name        string                         `json:"name"`
+	Version     string                         `json:"version"`
+	Description string                         `json:"description"`
+	Status      status.Status                  `json:"status"`
+	Metadata    types.JSONB[map[string]string] `gorm:"column:metadata;type:jsonb" json:"metadata"`
+	Tags        types.JSONB[map[string]string] `gorm:"column:tags;type:jsonb"     json:"tags"`
+	CreatedAt   time.Time                      `json:"created_at"`
+	ModifiedAt  time.Time                      `json:"modified_at"`
+	CreatedBy   string                         `json:"created_by"`
+	ModifiedBy  string                         `json:"modified_by"`
 }
 
 // Validate checks required fields, status values, and JSONB shape.
