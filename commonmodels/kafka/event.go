@@ -35,13 +35,13 @@ type Event struct {
 	Message           *string   `json:"message,omitempty"`
 
 	//  Body has to be JSON
-	Body      *types.JSONB[map[string]any]     `gorm:"type:jsonb" json:"body,omitempty"`
-	BodyURI   *string                          `json:"body_uri,omitempty"`
-	Metadata  types.JSONB[[]map[string]string] `gorm:"column:metadata;type:jsonb" json:"metadata"`
-	Tags      types.JSONB[map[string]string]   `gorm:"type:jsonb" json:"tags,omitempty"`
-	Timestamp time.Time                        `json:"timestamp"`
-	CreatedBy string                           `json:"created_by"`
-	MD5Hash   string                           `json:"md5_hash"`
+	Body      *types.JSONB[map[string]any]   `gorm:"type:jsonb" json:"body,omitempty"`
+	BodyURI   *string                        `json:"body_uri,omitempty"`
+	Metadata  types.JSONB[map[string]string] `gorm:"column:metadata;type:jsonb" json:"metadata"`
+	Tags      types.JSONB[map[string]string] `gorm:"type:jsonb" json:"tags,omitempty"`
+	Timestamp time.Time                      `json:"timestamp"`
+	CreatedBy string                         `json:"created_by"`
+	MD5Hash   string                         `json:"md5_hash"`
 
 	// Cfg has to be json
 	Cfg *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"cfg,omitempty"`

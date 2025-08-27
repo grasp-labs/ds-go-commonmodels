@@ -47,11 +47,8 @@ var EventJSONSchema = []byte(`
       },
   
       "metadata": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "additionalProperties": { "type": "string" }
-        }
+        "type": "object",
+        "additionalProperties": true
       },
   
       "tags": {
@@ -98,7 +95,7 @@ func newValidEvent() events.Event {
 		Message:           strp("hello"),
 		Body:              &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
 		BodyURI:           nil,
-		Metadata:          types.JSONB[[]map[string]string]{Data: []map[string]string{{"key": "value"}}},
+		Metadata:          types.JSONB[map[string]string]{Data: map[string]string{"key": "value"}},
 		Tags:              types.JSONB[map[string]string]{Data: map[string]string{"env": "test"}},
 		Timestamp:         time.Now().UTC(),
 		CreatedBy:         "dev@example.com",
