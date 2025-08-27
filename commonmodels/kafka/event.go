@@ -1,4 +1,4 @@
-package events
+package event
 
 import (
 	"regexp"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/types"
 	verr "github.com/grasp-labs/ds-go-commonmodels/commonmodels/validation_error"
 	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/validators/email"
@@ -41,6 +42,9 @@ type Event struct {
 	Timestamp time.Time                        `json:"timestamp"`
 	CreatedBy string                           `json:"created_by"`
 	MD5Hash   string                           `json:"md5_hash"`
+
+	// Cfg has to be json
+	Cfg *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"cfg,omitempty"`
 }
 
 // Validate checks required fields, status values, and JSONB shape.
@@ -119,6 +123,12 @@ func (e *Event) Validate() ValidationErrors {
 	}
 	if err := e.Metadata.Validate(); err != nil {
 		req("metadata", "invalid JSON structure")
+	}
+
+	if e.Cfg != nil {
+		if err := e.Cfg.Validate(); err != nil {
+			req("body", "invalid JSON structure")
+		}
 	}
 
 	return errs

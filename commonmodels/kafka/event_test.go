@@ -1,5 +1,5 @@
 // event_test.go
-package events_test
+package event_test
 
 import (
 	"strings"
