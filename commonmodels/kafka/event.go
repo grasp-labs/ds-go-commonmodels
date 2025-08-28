@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/types"
-	verr "github.com/grasp-labs/ds-go-commonmodels/commonmodels/validation_error"
-	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/validators/email"
-	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/validators/uri"
+	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
+	verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
+	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validators/email"
+	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validators/uri"
 )
 
 // ValidationErrors is a collection of field-level validation errors.
