@@ -25,13 +25,15 @@ func newValidEvent() events.Event {
 		EventSource:       "unit-test",
 		EventSourceURI:    strp("https://example.com/source"),
 		AffectedEntityURI: strp("https://example.com/entity"),
-		Body:              &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
-		BodyURI:           nil,
+		Payload:           &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
+		PayloadURI:        nil,
 		Metadata:          types.JSONB[map[string]string]{Data: map[string]string{"m": "1"}},
 		Tags:              types.JSONB[map[string]string]{Data: map[string]string{"env": "test"}},
 		Timestamp:         time.Now().UTC(),
 		CreatedBy:         "dev@example.com",
 		MD5Hash:           validMD5(),
+		Context:           &types.JSONB[map[string]any]{Data: map[string]any{"k": "v"}},
+		ContextURI:        strp("https://example.com/ctx"),
 	}
 }
 
@@ -80,8 +82,8 @@ func TestEventValidate_MissingRequireds(t *testing.T) {
 func TestEventValidate_BodyVsBodyURI(t *testing.T) {
 	// Both empty -> error on both fields
 	ev := newValidEvent()
-	ev.Body = nil
-	ev.BodyURI = nil
+	ev.Payload = nil
+	ev.PayloadURI = nil
 	errs := ev.Validate()
 	if !hasErr(errs, "body", "cannot both be empty") || !hasErr(errs, "body_uri", "cannot both be empty") {
 		t.Fatalf("expected both body/body_uri emptiness errors, got: %+v", errs)
@@ -89,15 +91,15 @@ func TestEventValidate_BodyVsBodyURI(t *testing.T) {
 
 	// Only Body present (non-empty) -> OK
 	ev = newValidEvent()
-	ev.BodyURI = nil
+	ev.PayloadURI = nil
 	if errs := ev.Validate(); len(errs) != 0 {
 		t.Fatalf("body-only should be valid, got: %+v", errs)
 	}
 
 	// Only BodyURI present (non-empty) -> OK
 	ev = newValidEvent()
-	ev.Body = nil
-	ev.BodyURI = strp("https://example.com/payload")
+	ev.Payload = nil
+	ev.PayloadURI = strp("https://example.com/payload")
 	if errs := ev.Validate(); len(errs) != 0 {
 		t.Fatalf("body_uri-only should be valid, got: %+v", errs)
 	}
@@ -108,7 +110,7 @@ func TestEventValidate_InvalidURIs(t *testing.T) {
 	bad := "::::not-a-valid-uri"
 	ev.EventSourceURI = &bad
 	ev.AffectedEntityURI = &bad
-	ev.BodyURI = &bad
+	ev.PayloadURI = &bad
 
 	errs := ev.Validate()
 	for _, f := range []string{"event_source_uri", "affected_entity_uri", "body_uri"} {
@@ -137,9 +139,9 @@ func TestEventValidate_JSONBStructureErrors(t *testing.T) {
 
 	// Make Body JSON invalid for encoding/json by inserting a channel value.
 	ch := make(chan int)
-	ev.Body = &types.JSONB[map[string]any]{Data: map[string]any{"bad": ch}}
+	ev.Payload = &types.JSONB[map[string]any]{Data: map[string]any{"bad": ch}}
 	// Provide BodyURI so presence rule isn't tripped
-	ev.BodyURI = strp("https://example.com/payload")
+	ev.PayloadURI = strp("https://example.com/payload")
 
 	errs := ev.Validate()
 	if !hasErr(errs, "body", "invalid JSON structure") {

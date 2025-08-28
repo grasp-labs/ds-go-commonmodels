@@ -231,10 +231,8 @@ func TestManualLifeCycle_create(t *testing.T) {
 	issuer := "grasp-labs"
 	tenantId := uuid.MustParse("25948ccc-cf16-491e-9cd4-44d5ebb7bc54")
 
-	meta := []map[string]string{
-		{"owner_id": "xyz123"},
-		{"retention": "365"},
-	}
+	meta := map[string]string{"owner_id": "xyz123", "retention": "365"}
+
 	tags := map[string]string{
 		"env":       "prod",
 		"tenant_id": tenantId.String(),
@@ -242,7 +240,7 @@ func TestManualLifeCycle_create(t *testing.T) {
 
 	c := core.CoreModel{
 		Name:     "Webhook config for X",
-		Metadata: types.JSONB[[]map[string]string]{Data: meta},
+		Metadata: types.JSONB[map[string]string]{Data: meta},
 		Tags:     types.JSONB[map[string]string]{Data: tags},
 		Status:   "active",
 	}

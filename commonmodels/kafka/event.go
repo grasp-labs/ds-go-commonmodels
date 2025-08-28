@@ -34,17 +34,19 @@ type Event struct {
 	AffectedEntityURI *string   `json:"affected_entity_uri,omitempty"`
 	Message           *string   `json:"message,omitempty"`
 
-	//  Body has to be JSON
-	Body      *types.JSONB[map[string]any]   `gorm:"type:jsonb" json:"body,omitempty"`
-	BodyURI   *string                        `json:"body_uri,omitempty"`
+	//  Body has to be JSON - The Domain referenced object
+	Payload    *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"payload,omitempty"`
+	PayloadURI *string                      `json:"payload_uri,omitempty"`
+
 	Metadata  types.JSONB[map[string]string] `gorm:"column:metadata;type:jsonb" json:"metadata"`
 	Tags      types.JSONB[map[string]string] `gorm:"type:jsonb" json:"tags,omitempty"`
 	Timestamp time.Time                      `json:"timestamp"`
 	CreatedBy string                         `json:"created_by"`
 	MD5Hash   string                         `json:"md5_hash"`
 
-	// Cfg has to be json
-	Cfg *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"cfg,omitempty"`
+	// Context has to be json - Typically a bearer of processing information for consumers
+	Context    *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"context,omitempty"`
+	ContextURI *string                      `json:"context_uri,omitempty"`
 }
 
 // Validate checks required fields, status values, and JSONB shape.
@@ -76,15 +78,15 @@ func (e *Event) Validate() ValidationErrors {
 		req("event_source", "required")
 	}
 
-	// body/body_uri rule: require at least one non-empty; optionally forbid both
-	var bodyEmpty bool
-	if e.Body == nil {
-		bodyEmpty = true
+	// data/data_uri rule: require at least one non-empty; optionally forbid both
+	var payloadEmpty bool
+	if e.Payload == nil {
+		payloadEmpty = true
 	} else {
-		bodyEmpty = e.Body.Empty()
+		payloadEmpty = e.Payload.Empty()
 	}
-	bodyURINilOrEmpty := e.BodyURI == nil || strings.TrimSpace(*e.BodyURI) == ""
-	if bodyEmpty && bodyURINilOrEmpty {
+	payloadURINilOrEmpty := e.PayloadURI == nil || strings.TrimSpace(*e.PayloadURI) == ""
+	if payloadEmpty && payloadURINilOrEmpty {
 		req("body", "body and body_uri cannot both be empty")
 		req("body_uri", "body and body_uri cannot both be empty")
 	}
@@ -95,7 +97,10 @@ func (e *Event) Validate() ValidationErrors {
 	if ve := uri.ValidateURI("affected_entity_uri", e.AffectedEntityURI, false); ve != nil {
 		errs = append(errs, *ve)
 	}
-	if ve := uri.ValidateURI("body_uri", e.BodyURI, false); ve != nil {
+	if ve := uri.ValidateURI("body_uri", e.PayloadURI, false); ve != nil {
+		errs = append(errs, *ve)
+	}
+	if ve := uri.ValidateURI("context_uri", e.ContextURI, false); ve != nil {
 		errs = append(errs, *ve)
 	}
 	if e.Timestamp.IsZero() {
@@ -113,8 +118,8 @@ func (e *Event) Validate() ValidationErrors {
 	if e.MD5Hash == "" || !md5Re.MatchString(e.MD5Hash) {
 		req("md5_hash", "must be a 32-char hex MD5")
 	}
-	if e.Body != nil {
-		if err := e.Body.Validate(); err != nil {
+	if e.Payload != nil {
+		if err := e.Payload.Validate(); err != nil {
 			req("body", "invalid JSON structure")
 		}
 	}
@@ -125,8 +130,8 @@ func (e *Event) Validate() ValidationErrors {
 		req("metadata", "invalid JSON structure")
 	}
 
-	if e.Cfg != nil {
-		if err := e.Cfg.Validate(); err != nil {
+	if e.Context != nil {
+		if err := e.Context.Validate(); err != nil {
 			req("body", "invalid JSON structure")
 		}
 	}
