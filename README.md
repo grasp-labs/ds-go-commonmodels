@@ -1,6 +1,6 @@
 # ds-go-commonmodels — Common Models for the DS Platform in Go
 
-![Build](https://github.com/grasp-labs/ds-go-commonmodels/v2/actions/workflows/ci.yml/badge.svg)
+![Build](https://github.com/grasp-labs/ds-go-commonmodels/actions/workflows/ci.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/grasp-labs/ds-go-commonmodels)](https://goreportcard.com/report/github.com/grasp-labs/ds-go-commonmodels)
 [![codecov](https://codecov.io/gh/grasp-labs/ds-go-commonmodels/branch/main/graph/badge.svg)](https://codecov.io/gh/grasp-labs/ds-go-commonmodels)
 [![Latest tag](https://img.shields.io/github/v/tag/grasp-labs/ds-go-commonmodels?sort=semver)](https://github.com/grasp-labs/ds-go-commonmodels/v2/tags)
