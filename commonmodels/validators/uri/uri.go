@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	verr "github.com/grasp-labs/ds-go-commonmodels/commonmodels/validation_error"
+	verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
 )
 
 // required=false means: empty/nil is allowed.

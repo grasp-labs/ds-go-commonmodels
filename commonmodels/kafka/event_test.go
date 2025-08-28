@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
-	events "github.com/grasp-labs/ds-go-commonmodels/commonmodels/kafka"
-	"github.com/grasp-labs/ds-go-commonmodels/commonmodels/types"
+	events "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/kafka"
+	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
 )
 
 func strp(s string) *string { return &s }

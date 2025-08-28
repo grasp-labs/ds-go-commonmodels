@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"strings"
 
-	verr "github.com/grasp-labs/ds-go-commonmodels/commonmodels/validation_error"
+	verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
 	"github.com/xeipuuv/gojsonschema"
 )
 

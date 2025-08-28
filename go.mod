@@ -1,4 +1,4 @@
-module github.com/grasp-labs/ds-go-commonmodels
+module github.com/grasp-labs/ds-go-commonmodels/v2
 
 go 1.25.0
 

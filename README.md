@@ -59,7 +59,6 @@ go get github.com/grasp-labs/ds-go-commonmodels@v1.1.0-rc.1
   "updated_at": "2025-08-23T10:15:30Z",
   "updated_by": "user@domain.com"
 }
-
 ```
 
 ### Basic

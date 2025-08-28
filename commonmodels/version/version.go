@@ -1,6 +1,6 @@
 package version
 
-import verr "github.com/grasp-labs/ds-go-commonmodels/commonmodels/validation_error"
+import verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
 
 type Version struct {
 	Version string `json:"version"`
