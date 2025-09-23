@@ -32,7 +32,7 @@ const NoneFieldError = "none_field_error"
 //	if errs := json_schema.ValidateAgainstSchema(b, EventJSONSchema); len(errs) > 0 {
 //	    // surface errs to the user as your API's standard validation errors
 //	}
-func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte, loc string, code string) []verr.ValidationError {
+func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte) []verr.ValidationError {
 	schemaLoader := gojsonschema.NewBytesLoader(jsonSchema)
 	docLoader := gojsonschema.NewBytesLoader(docBytes)
 
@@ -41,8 +41,6 @@ func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte, loc string, code 
 		return []verr.ValidationError{{
 			Field:   NoneFieldError,
 			Message: "schema validator error: " + err.Error(),
-			Loc:     loc,
-			Code:    code,
 		}}
 	}
 
@@ -60,8 +58,6 @@ func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte, loc string, code 
 		errs = append(errs, verr.ValidationError{
 			Field:   field,
 			Message: fmt.Sprintf("(%s): %s", kw, issue.Description()),
-			Loc:     loc,
-			Code:    code,
 		})
 	}
 	return errs
