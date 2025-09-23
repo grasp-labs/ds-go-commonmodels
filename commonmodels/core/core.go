@@ -26,10 +26,6 @@ import (
 //	defer func() { Now = old }()
 var Now = func() time.Time { return time.Now().UTC() }
 
-// ValidationErrors is a collection of field-level validation errors.
-// The element type ValidationError is defined in errors.go.
-type ValidationErrors []verr.ValidationError
-
 // BaseModel defines a common set of fields shared by persisted entities.
 // Embed this type in your structs to inherit IDs, tenancy, audit metadata,
 // status, and JSONB-backed free-form metadata and tags.
@@ -59,11 +55,13 @@ type CoreModel struct {
 //
 // Call this after defaults have been applied (e.g., after Create/Touch or
 // after GORM hooks). It returns nil if the model is valid.
-func (b *CoreModel) Validate() ValidationErrors {
-	var errs ValidationErrors
+func (b *CoreModel) Validate(loc string, code string) []verr.ValidationError {
+	var errs []verr.ValidationError
 
 	// local function helper creating and appending errors.
-	req := func(field, msg string) { errs = append(errs, verr.ValidationError{Field: field, Message: msg}) }
+	req := func(field, msg string) {
+		errs = append(errs, verr.ValidationError{Field: field, Message: msg, Loc: loc, Code: code})
+	}
 
 	if b.ID == uuid.Nil {
 		req("id", "required")
