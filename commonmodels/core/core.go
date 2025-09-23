@@ -55,7 +55,7 @@ type CoreModel struct {
 //
 // Call this after defaults have been applied (e.g., after Create/Touch or
 // after GORM hooks). It returns nil if the model is valid.
-func (b *CoreModel) Validate(loc string, code string) []verr.ValidationError {
+func (b *CoreModel) ValidateWithContext(loc string, code string) []verr.ValidationError {
 	var errs []verr.ValidationError
 
 	// local function helper creating and appending errors.
@@ -106,6 +106,10 @@ func (b *CoreModel) Validate(loc string, code string) []verr.ValidationError {
 	}
 
 	return errs
+}
+
+func (b *CoreModel) Validate() []verr.ValidationError {
+	return b.ValidateWithContext("", "")
 }
 
 // Create applies create-time defaults and audit fields to Core model.
