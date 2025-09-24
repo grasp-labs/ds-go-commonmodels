@@ -3,9 +3,10 @@ package validation_error
 type Location string
 
 const (
-	Header Location = "header"
-	Query  Location = "query"
 	Body   Location = "body"
+	Header Location = "header"
+	Path   Location = "path"
+	Query  Location = "query"
 )
 
 // The ValidationError is a common model used to
@@ -38,7 +39,8 @@ type ValidationError struct {
 }
 
 var ValidLocations = map[Location]struct{}{
-	Header: {},
-	Query:  {},
 	Body:   {},
+	Header: {},
+	Path:   {},
+	Query:  {},
 }

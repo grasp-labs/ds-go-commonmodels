@@ -43,7 +43,7 @@ func TestCoreModel_Validate_ID_is_required_and_uuid(t *testing.T) {
 		}
 	}
 	assert.True(t, exist)
-	assert.Equal(t, message, "required")
+	assert.Equal(t, message, "id is required.")
 
 	coreModel.ID = uuid.New()
 }
@@ -71,7 +71,7 @@ func TestCoreModel_Validate_TenantID_is_required_and_uuid(t *testing.T) {
 		}
 	}
 	assert.True(t, exist)
-	assert.Equal(t, message, "required")
+	assert.Equal(t, message, "tenant_id is required.")
 
 	coreModel.TenantID = uuid.New()
 }
@@ -99,7 +99,7 @@ func TestCoreModel_Validate_Name_is_requiredand_string(t *testing.T) {
 		}
 	}
 	assert.True(t, exist)
-	assert.Equal(t, message, "required")
+	assert.Equal(t, message, "name is required.")
 
 	coreModel.Name = "test"
 }
@@ -128,7 +128,7 @@ func TestCoreModel_Validate_CreatedBy_is_requiredand_string(t *testing.T) {
 	}
 	assert.True(t, exist)
 	allowed := map[string]struct{}{
-		"required": {}, "not a valid email format": {},
+		"created_by is required.": {}, "created_by must be a valid email address.": {},
 	}
 	_, ok := allowed[message]
 
@@ -161,7 +161,7 @@ func TestCoreModel_Validate_ModifiedBy_is_required_string(t *testing.T) {
 	}
 	assert.True(t, exist)
 	allowed := map[string]struct{}{
-		"required": {}, "not a valid email format": {},
+		"modified_by is required.": {}, "modified_by must be a valid email address.": {},
 	}
 	_, ok := allowed[message]
 
@@ -193,7 +193,7 @@ func TestCoreModel_Validate_CreatedAt_is_required_timestamp(t *testing.T) {
 		}
 	}
 	assert.True(t, exist)
-	assert.Equal(t, message, "required")
+	assert.Equal(t, message, "created_at is required.")
 
 	coreModel.CreatedAt = time.Now().UTC()
 }
@@ -221,7 +221,7 @@ func TestCoreModel_Validate_ModifiedAt_is_required_timestamp(t *testing.T) {
 		}
 	}
 	assert.True(t, exist)
-	assert.Equal(t, message, "required")
+	assert.Equal(t, message, "modified_at is required.")
 
 	coreModel.CreatedAt = time.Now().UTC()
 }

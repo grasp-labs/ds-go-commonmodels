@@ -16,3 +16,5 @@ package validation_error
 type ErrorEnvelope struct {
 	Details []ValidationError `json:"details"`
 }
+
+//func (e *ErrorEnvelope) Marshal
