@@ -4,12 +4,12 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	errC "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
 	status "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/status"
 	types "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
 	verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
@@ -25,10 +25,6 @@ import (
 //	Now = func() time.Time { return fixed }
 //	defer func() { Now = old }()
 var Now = func() time.Time { return time.Now().UTC() }
-
-// ValidationErrors is a collection of field-level validation errors.
-// The element type ValidationError is defined in errors.go.
-type ValidationErrors []verr.ValidationError
 
 // BaseModel defines a common set of fields shared by persisted entities.
 // Embed this type in your structs to inherit IDs, tenancy, audit metadata,
@@ -59,55 +55,64 @@ type CoreModel struct {
 //
 // Call this after defaults have been applied (e.g., after Create/Touch or
 // after GORM hooks). It returns nil if the model is valid.
-func (b *CoreModel) Validate() ValidationErrors {
-	var errs ValidationErrors
+func (b *CoreModel) ValidateWithContext(loc string, code string, locale string) []verr.ValidationError {
+	if locale == "" {
+		locale = "en"
+	}
+	var errs []verr.ValidationError
 
 	// local function helper creating and appending errors.
-	req := func(field, msg string) { errs = append(errs, verr.ValidationError{Field: field, Message: msg}) }
-
+	req := func(field, code string) {
+		msg := errC.HumanMessageLocale(locale, code, field)
+		errs = append(errs, verr.ValidationError{Field: field, Message: msg, Loc: loc, Code: code})
+	}
 	if b.ID == uuid.Nil {
-		req("id", "required")
+		req("id", errC.Required)
 	}
 	if b.TenantID == uuid.Nil {
-		req("tenant_id", "required")
+		req("tenant_id", errC.Required)
 	}
 	if b.Name == "" {
-		req("name", "required")
+		req("name", errC.Required)
 	}
 	if b.CreatedBy == "" {
-		req("created_by", "required")
+		req("created_by", errC.Required)
 	}
 	if !email.IsEmailFormat(b.CreatedBy) {
-		req("created_by", "not a valid email format")
+		req("created_by", errC.InvalidEmailFormat)
 	}
 	if b.ModifiedBy == "" {
-		req("modified_by", "required")
+		req("modified_by", errC.Required)
 	}
 	if !email.IsEmailFormat(b.ModifiedBy) {
-		req("modified_by", "not a valid email format")
+		req("modified_by", errC.InvalidEmailFormat)
 	}
 	if b.CreatedAt.IsZero() {
-		req("created_at", "required")
+		req("created_at", errC.Required)
 	}
 	if b.ModifiedAt.IsZero() {
-		req("modified_at", "required")
+		req("modified_at", errC.Required)
 	}
 
 	switch b.Status {
 	case status.Active, status.Deleted, status.Suspended, status.Rejected, status.Draft:
 		// ok
 	default:
-		req("status", fmt.Sprintf("invalid %q; expected one of active, deleted, suspended, rejected, draft", b.Status))
+		req("status", errC.InvalidStatus)
 	}
 
 	if err := b.Metadata.Validate(); err != nil {
-		req("metadata", "invalid JSON structure")
+		req("metadata", errC.InvalidJSONFormat)
 	}
 	if err := b.Tags.Validate(); err != nil {
-		req("tags", "invalid JSON structure")
+		req("tags", errC.InvalidJSONFormat)
 	}
 
 	return errs
+}
+
+func (b *CoreModel) Validate() []verr.ValidationError {
+	return b.ValidateWithContext("body", "", "en")
 }
 
 // Create applies create-time defaults and audit fields to Core model.
