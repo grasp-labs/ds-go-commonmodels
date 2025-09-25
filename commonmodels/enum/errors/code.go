@@ -36,6 +36,10 @@ const (
 	InvalidStatus      = "invalid_status"
 )
 
+// -----------------------------------------------------------------------------
+// Human readable error messages EN
+// -----------------------------------------------------------------------------
+
 var messagesEN = map[string]string{
 	Internal:           "Something went wrong on our side. Please try again.",
 	Unauthorized:       "You need to sign in to continue.",
@@ -51,7 +55,11 @@ var messagesEN = map[string]string{
 	InvalidStatus:      "The provided status %s is invalid. It should be one of active, deleted, suspended, rejected, draft",
 }
 
-var messagesNB = map[string]string{ // Norwegian Bokmål (optional starter set)
+// -----------------------------------------------------------------------------
+// Human readable error messages NB
+// -----------------------------------------------------------------------------
+
+var messagesNB = map[string]string{
 	Internal:           "Noe gikk galt hos oss. Prøv igjen.",
 	Unauthorized:       "Du må være innlogget for å fortsette.",
 	Forbidden:          "Du har ikke tilgang til denne handlingen.",
@@ -66,6 +74,10 @@ var messagesNB = map[string]string{ // Norwegian Bokmål (optional starter set)
 	InvalidStatus:      "Oppgitt statusverdi er ugyldig.",
 }
 
+// -----------------------------------------------------------------------------
+// Message catalog
+// -----------------------------------------------------------------------------
+
 var catalogs = map[string]map[string]string{
 	"en": messagesEN,
 	"nb": messagesNB,
@@ -73,6 +85,18 @@ var catalogs = map[string]map[string]string{
 
 // HumanMessage returns a human-readable message for a machine code.
 // args are passed to fmt.Sprintf to fill placeholders like %s.
+//
+// # Example usage
+//
+// // local function helper creating and appending errors.
+//
+//	req := func(field, code string) {
+//		msg := errC.HumanMessageLocale(locale, code, field)
+//		errs = append(errs, verr.ValidationError{Field: field, Message: msg, Loc: loc, Code: code})
+//	}
+//
+// // Plain
+// msg := errC.HumanMessageLocale("en", errC.Required, "id")
 func HumanMessage(code string, args ...any) string {
 	return HumanMessageLocale("en", code, args...)
 }
