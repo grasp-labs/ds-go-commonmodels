@@ -205,7 +205,7 @@ func TestTooManyRequests(t *testing.T) {
 	}
 	expect = "too many requests"
 	if hErr.Message != expect {
-		t.Fatalf("expected %s, got %s", expect, hErr.Code)
+		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
 	if _, err := uuid.Parse(hErr.RequestID); err != nil {
 		t.Fatalf("failed to parse, err: %v", err)
