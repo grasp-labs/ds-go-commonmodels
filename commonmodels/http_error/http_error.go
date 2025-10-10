@@ -175,7 +175,7 @@ func TooManyRequests(requestID string, msg string) *HTTPError {
 		msg = "too many requests"
 	}
 	return NewHTTPError(requestID, errC.TooManyRequests, msg, http.StatusTooManyRequests).
-		WithRetry(60) // Defaults to reccommending retry after 60 seconds
+		WithRetry(60) // Defaults to recommending retry after 60 seconds
 }
 
 // ServiceUnavailable returns a 503 Service Unavailable error.
