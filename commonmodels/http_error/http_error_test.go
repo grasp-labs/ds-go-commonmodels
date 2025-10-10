@@ -28,7 +28,7 @@ func TestHttpError_NotFound(t *testing.T) {
 
 	statusCode, headers, hErr := httpErr.Response()
 	if statusCode != http.StatusNotFound {
-		t.Fatalf("expected %d, got %d", http.StatusNotFound, status)
+		t.Fatalf("expected %d, got %d", http.StatusNotFound, statusCode)
 	}
 	if retryHeader := headers.Get("Retry-After"); retryHeader != "" {
 		t.Fatalf("expected empty Retry-After header, got %s", retryHeader)
@@ -79,7 +79,7 @@ func TestBadRequest(t *testing.T) {
 
 	statusCode, headers, hErr := httpErr.Response()
 	if statusCode != http.StatusBadRequest {
-		t.Fatalf("expected %d, got %d", http.StatusBadRequest, status)
+		t.Fatalf("expected %d, got %d", http.StatusBadRequest, statusCode)
 	}
 	if retryHeader := headers.Get("Retry-After"); retryHeader != "" {
 		t.Fatalf("expected empty Retry-After header, got %s", retryHeader)
@@ -94,7 +94,7 @@ func TestBadRequest(t *testing.T) {
 	}
 	expect = "invalid payload"
 	if hErr.Message != expect {
-		t.Fatalf("expected %s, got %s", expect, hErr.Code)
+		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
 	if _, err := uuid.Parse(hErr.RequestID); err != nil {
 		t.Fatalf("failed to parse, err: %v", err)
@@ -138,7 +138,7 @@ func TestBadRequest_CustomTime(t *testing.T) {
 
 	statusCode, headers, hErr := httpErr.Response()
 	if statusCode != http.StatusBadRequest {
-		t.Fatalf("expected %d, got %d", http.StatusBadRequest, status)
+		t.Fatalf("expected %d, got %d", http.StatusBadRequest, statusCode)
 	}
 	if retryHeader := headers.Get("Retry-After"); retryHeader != "120" {
 		t.Fatalf("expected Retry-After header to be 120, got %s", retryHeader)
@@ -150,7 +150,7 @@ func TestBadRequest_CustomTime(t *testing.T) {
 	}
 	expect = "invalid payload"
 	if hErr.Message != expect {
-		t.Fatalf("expected %s, got %s", expect, hErr.Code)
+		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
 	if _, err := uuid.Parse(hErr.RequestID); err != nil {
 		t.Fatalf("failed to parse, err: %v", err)
@@ -194,7 +194,7 @@ func TestTooManyRequests(t *testing.T) {
 
 	statusCode, headers, hErr := httpErr.Response()
 	if statusCode != http.StatusTooManyRequests {
-		t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, status)
+		t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, statusCode)
 	}
 	if retryHeader := headers.Get("Retry-After"); retryHeader != "60" {
 		t.Fatalf("expected Retry-After header to be 60, got %s", retryHeader)
@@ -249,7 +249,7 @@ func TestWithRetry(t *testing.T) {
 
 	statusCode, headers, hErr := httpErr.Response()
 	if statusCode != http.StatusTooManyRequests {
-		t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, status)
+		t.Fatalf("expected %d, got %d", http.StatusTooManyRequests, statusCode)
 	}
 	if retryHeader := headers.Get("Retry-After"); retryHeader != "90" {
 		t.Fatalf("expected Retry-After header to be 90, got %s", retryHeader)
@@ -260,7 +260,7 @@ func TestWithRetry(t *testing.T) {
 	}
 	expect = "too many requests"
 	if hErr.Message != expect {
-		t.Fatalf("expected %s, got %s", expect, hErr.Code)
+		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
 	if _, err := uuid.Parse(hErr.RequestID); err != nil {
 		t.Fatalf("failed to parse, err: %v", err)
