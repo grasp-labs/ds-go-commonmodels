@@ -25,7 +25,9 @@ import (
 //	  "error": {
 //	    "code": "bad_request",
 //	    "message": "invalid payload",
-//	    "request_id": "3c640e85-75b3-4e0b-84c3-1b8427a64e23"
+//	    "request_id": "3c640e85-75b3-4e0b-84c3-1b8427a64e23",
+//	    "recoverable": true,
+//	    "retry_after": 120
 //	  }
 //	}
 //
@@ -33,6 +35,7 @@ import (
 //   - Code:       a stable, machine-readable identifier.
 //   - Message:    a human-readable description safe to show clients.
 //   - RequestID:  always present, injected by middleware (never omitted).
+//   - Recoverable: (optional) indicates if the error is likely to be transient and if retrying might succeed.
 //   - RetryAfter:  (optional) seconds to wait before retrying indicating the client should wait before retrying.
 //
 // Internal-only:
@@ -207,8 +210,7 @@ func FromError(requestID string, err error) *HTTPError {
 }
 
 // WithRetry sets the RetryAfter field and returns the modified error.
-// It indicates that the client should wait before retrying.
-// If retryAfterSeconds is zero or negative, the field is omitted.
+// If retryAfterSeconds > 0, it also sets Recoverable to true, otherwise false.
 func (e *HTTPError) WithRetry(retryAfterSeconds int) *HTTPError {
 	e.RetryAfter = retryAfterSeconds
 
