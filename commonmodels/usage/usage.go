@@ -47,7 +47,7 @@ func (u *UsageEntry) Validate() []val_err.ValidationError {
 	if u.MemoryMB <= 0 {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "memory_mb",
-			Message: "Required.",
+			Message: "Must be greater than 0.",
 		})
 	}
 	if u.StartTimestamp.IsZero() {
