@@ -75,7 +75,7 @@ func (u *UsageEntry) Validate() []val_err.ValidationError {
 	if u.Duration <= 0 {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "duration",
-			Message: "Required.",
+			Message: "Must be greater than 0.",
 		})
 	}
 	if u.Status == "" {
