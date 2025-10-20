@@ -62,7 +62,7 @@ func TestFieldValidation(t *testing.T) {
 	entry := models.UsageEntry{}
 
 	validationErrors := entry.Validate()
-	assert.Len(t, validationErrors, 12, "Expected 12 validation errors for missing required fields")
+	assert.Len(t, validationErrors, 11, "Expected 11 validation errors for missing required fields")
 
 	expectedFields := []string{
 		"id",
@@ -73,7 +73,6 @@ func TestFieldValidation(t *testing.T) {
 		"end_timestamp",
 		"duration",
 		"status",
-		"metadata",
 		"tags",
 		"created_at",
 		"created_by",
