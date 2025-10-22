@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
+	err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
 	val_err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
 )
 
@@ -35,40 +36,50 @@ type AuditEntry struct {
 	Correlation string    `json:"correlation_id"` // Optional: cross-service trace
 }
 
-func (a *AuditEntry) Validate() []val_err.ValidationError {
+func (a *AuditEntry) Validate(locale string) []val_err.ValidationError {
 	var errors []val_err.ValidationError
 	if a.Subject == "" {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "subject",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "subject"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 
 	if a.TenantID == uuid.Nil {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "tenant_id",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "tenant_id"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 
 	if a.HTTPMethod == "" {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "http_method",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "http_method"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 
 	if a.Resource == "" {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "resource",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "resource"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 
 	if a.Timestamp.IsZero() {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "timestamp",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "timestamp"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
 

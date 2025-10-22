@@ -61,7 +61,7 @@ func TestUsageEntry_JSON_MarshalBasic(t *testing.T) {
 func TestFieldValidation(t *testing.T) {
 	entry := models.UsageEntry{}
 
-	validationErrors := entry.Validate()
+	validationErrors := entry.Validate("en")
 	assert.Len(t, validationErrors, 11, "Expected 11 validation errors for missing required fields")
 
 	expectedFields := []string{
@@ -105,7 +105,7 @@ func TestUsageEntry_Validate_EndBeforeStart(t *testing.T) {
 		CreatedBy:      "system",
 	}
 
-	errors := entry.Validate()
+	errors := entry.Validate("en")
 	assert.NotEmpty(t, errors)
 
 	found := false
@@ -158,7 +158,7 @@ func TestUsageEntry_Validate_NegativeValues(t *testing.T) {
 		CreatedBy:      "system",
 	}
 
-	errors := entry.Validate()
+	errors := entry.Validate("en")
 
 	// Should have errors for both memory_mb and duration
 	memoryError := false

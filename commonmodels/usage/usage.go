@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
 	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/status"
 	val_err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
 )
@@ -24,42 +25,54 @@ type UsageEntry struct {
 	CreatedBy      string              `json:"created_by"`
 }
 
-func (u *UsageEntry) Validate() []val_err.ValidationError {
+func (u *UsageEntry) Validate(locale string) []val_err.ValidationError {
 	var errors []val_err.ValidationError
 	if u.ID == uuid.Nil {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "id",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "id"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	if u.TenantID == uuid.Nil {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "tenant_id",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "tenant_id"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	if u.ProductID == uuid.Nil {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "product_id",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "product_id"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	if u.MemoryMB <= 0 {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "memory_mb",
-			Message: "Must be greater than 0.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "memory_mb"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
 	if u.StartTimestamp.IsZero() {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "start_timestamp",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "start_timestamp"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
 	if u.EndTimestamp.IsZero() {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "end_timestamp",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "end_timestamp"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
 
@@ -67,7 +80,9 @@ func (u *UsageEntry) Validate() []val_err.ValidationError {
 		if u.EndTimestamp.Before(u.StartTimestamp) || u.EndTimestamp.Equal(u.StartTimestamp) {
 			errors = append(errors, val_err.ValidationError{
 				Field:   "end_timestamp",
-				Message: "Must be after start_timestamp.",
+				Message: err.HumanMessageLocale(locale, err.ValidationFailed, "end_timestamp"),
+				Loc:     "body",
+				Code:    err.ValidationFailed,
 			})
 		}
 	}
@@ -75,31 +90,42 @@ func (u *UsageEntry) Validate() []val_err.ValidationError {
 	if u.Duration <= 0 {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "duration",
-			Message: "Must be greater than 0.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "duration"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
+
 	if u.Status == "" {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "status",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "status"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	if u.Tags == nil {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "tags",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "tags"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	if u.CreatedAt.IsZero() {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "created_at",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.ValidationFailed, "created_at"),
+			Loc:     "body",
+			Code:    err.ValidationFailed,
 		})
 	}
 	if u.CreatedBy == "" {
 		errors = append(errors, val_err.ValidationError{
 			Field:   "created_by",
-			Message: "Required.",
+			Message: err.HumanMessageLocale(locale, err.Required, "created_by"),
+			Loc:     "body",
+			Code:    err.Required,
 		})
 	}
 	return errors
