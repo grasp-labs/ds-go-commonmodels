@@ -34,6 +34,8 @@ const (
 	InvalidEmailFormat = "invalid_email_format"
 	InvalidJSONFormat  = "invalid_json_format"
 	InvalidStatus      = "invalid_status"
+	Invalid            = "invalid"
+	InvalidDataType    = "invalid_data_type"
 )
 
 // -----------------------------------------------------------------------------
@@ -52,7 +54,9 @@ var messagesEN = map[string]string{
 	Required:           "%s is required.",
 	InvalidEmailFormat: "%s must be a valid email address.",
 	InvalidJSONFormat:  "Request body must be valid JSON.",
-	InvalidStatus:      "The provided status %s is invalid. It should be one of active, deleted, suspended, rejected, draft",
+	InvalidStatus:      "The provided status %s is invalid. Allowed values include active, deleted, suspended, rejected, draft",
+	Invalid:            "Invalid",
+	InvalidDataType:    "The provided data type %s is invalid. Allowed values include string, int64, float64, decimal, time, datetime, bytes, uuid, map",
 }
 
 // -----------------------------------------------------------------------------
@@ -71,7 +75,9 @@ var messagesNB = map[string]string{
 	Required:           "%s er påkrevd.",
 	InvalidEmailFormat: "%s må være en gyldig e-postadresse.",
 	InvalidJSONFormat:  "Kroppen i forespørselen må være gyldig JSON.",
-	InvalidStatus:      "Oppgitt statusverdi er ugyldig.",
+	InvalidStatus:      "Oppgitt statusverdi er ugyldig. Gyldige verdier inkluderer active, deleted, suspended, rejected, draft",
+	Invalid:            "Ugyldig",
+	InvalidDataType:    "Oppgitt datatypeverdi er ugyldig. Gyldige verdier inkluderer string, int64, float64, decimal, time, datetime, bytes, uuid, map",
 }
 
 // -----------------------------------------------------------------------------
@@ -131,6 +137,7 @@ var statusByCode = map[string]int{
 	InvalidEmailFormat: http.StatusBadRequest,
 	InvalidJSONFormat:  http.StatusBadRequest,
 	InvalidStatus:      http.StatusBadRequest,
+	Invalid:            http.StatusBadRequest,
 }
 
 func StatusFor(code string) int {
