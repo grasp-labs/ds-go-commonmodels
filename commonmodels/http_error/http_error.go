@@ -8,6 +8,7 @@ package httperror
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	errC "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
 )
@@ -24,7 +25,9 @@ import (
 //	  "error": {
 //	    "code": "bad_request",
 //	    "message": "invalid payload",
-//	    "request_id": "3c640e85-75b3-4e0b-84c3-1b8427a64e23"
+//	    "request_id": "3c640e85-75b3-4e0b-84c3-1b8427a64e23",
+//	    "recoverable": true,
+//	    "retry_after": 120
 //	  }
 //	}
 //
@@ -32,14 +35,18 @@ import (
 //   - Code:       a stable, machine-readable identifier.
 //   - Message:    a human-readable description safe to show clients.
 //   - RequestID:  always present, injected by middleware (never omitted).
+//   - Recoverable: (optional) indicates if the error is likely to be transient and if retrying might succeed.
+//   - RetryAfter:  (optional) seconds to wait before retrying indicating the client should wait before retrying.
 //
 // Internal-only:
 //   - cause:   the underlying Go error (not serialized).
 //   - status:  HTTP status code to return.
 type HTTPError struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
+	Code        string `json:"code"`
+	Message     string `json:"message"`
+	RequestID   string `json:"request_id"`
+	Recoverable bool   `json:"recoverable"`
+	RetryAfter  int    `json:"retry_after"`
 
 	cause  error
 	status int
@@ -99,8 +106,12 @@ func (e *HTTPError) Status() int {
 // Response returns (statusCode, *HttpError).
 //
 //	status, httpErr := err.Response(); return c.JSON(status, httpErr)
-func (e *HTTPError) Response() (int, *HTTPError) {
-	return e.Status(), e
+func (e *HTTPError) Response() (int, http.Header, *HTTPError) {
+	headers := make(http.Header)
+	if e.RetryAfter > 0 {
+		headers.Set("Retry-After", strconv.Itoa(e.RetryAfter))
+	}
+	return e.Status(), headers, e
 }
 
 // -----------------------------------------------------------------------------
@@ -158,6 +169,24 @@ func Conflict(requestID string, msg string) *HTTPError {
 	return NewHTTPError(requestID, errC.Conflict, msg, http.StatusConflict)
 }
 
+// TooManyRequests returns a 429 Too Many Requests error.
+func TooManyRequests(requestID string, msg string) *HTTPError {
+	if msg == "" {
+		msg = "too many requests"
+	}
+	return NewHTTPError(requestID, errC.TooManyRequests, msg, http.StatusTooManyRequests).
+		WithRetry(60) // Defaults to recommending retry after 60 seconds
+}
+
+// ServiceUnavailable returns a 503 Service Unavailable error.
+func ServiceUnavailable(requestID string, msg string) *HTTPError {
+	if msg == "" {
+		msg = "service temporarily unavailable"
+	}
+	return NewHTTPError(requestID, errC.Internal, msg, http.StatusServiceUnavailable).
+		WithRetry(30) // Defaults to recommending retry after 30 seconds
+}
+
 // BadRequest returns a 400 Bad Request error.
 func BadRequest(requestID string, msg string) *HTTPError {
 	if msg == "" {
@@ -178,4 +207,17 @@ func FromError(requestID string, err error) *HTTPError {
 		return he
 	}
 	return Internal(requestID, "").WithCause(err)
+}
+
+// WithRetry sets the RetryAfter field and returns the modified error.
+// If retryAfterSeconds > 0, it also sets Recoverable to true, otherwise false.
+func (e *HTTPError) WithRetry(retryAfterSeconds int) *HTTPError {
+	e.RetryAfter = retryAfterSeconds
+
+	if retryAfterSeconds > 0 {
+		e.Recoverable = true
+	} else {
+		e.Recoverable = false
+	}
+	return e
 }
