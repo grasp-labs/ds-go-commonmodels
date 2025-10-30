@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	he "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/http_error"
+	he "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/http_error"
 )
 
 func TestHttpError_NotFound(t *testing.T) {

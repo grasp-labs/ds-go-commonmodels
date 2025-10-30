@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	models "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/audit"
+	models "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/audit"
 )
 
 func TestAuditEntry_JSON_MarshalBasic(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	page "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/page"
+	page "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/page"
 	"github.com/stretchr/testify/assert"
 )
 

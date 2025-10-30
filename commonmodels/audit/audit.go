@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
-	err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
-	val_err "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
+	err "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/errors"
+	val_err "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
 )
 
 type AuditEntry struct {

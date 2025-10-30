@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/core"
-	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
+	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/core"
+	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/types"
 	"github.com/stretchr/testify/assert"
 )
 

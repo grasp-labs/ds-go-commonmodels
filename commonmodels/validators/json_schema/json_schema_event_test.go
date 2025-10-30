@@ -8,9 +8,9 @@ import (
 
 	"github.com/google/uuid"
 
-	events "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/kafka"
-	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
-	js "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validators/json_schema"
+	events "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/kafka"
+	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/types"
+	js "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validators/json_schema"
 )
 
 var EventJSONSchema = []byte(`

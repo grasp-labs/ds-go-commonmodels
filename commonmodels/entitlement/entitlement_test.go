@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	models "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/entitlement"
+	models "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/entitlement"
 )
 
 func TestEntitlement_JSON_MarshalBasic(t *testing.T) {

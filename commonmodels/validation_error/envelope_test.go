@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	ve "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
+	ve "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
 )
 
 func TestEnvelope_WrapValidationErrorAndMarshal(t *testing.T) {
