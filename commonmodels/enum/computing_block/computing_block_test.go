@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	cb "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/computing_block"
+	cb "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/computing_block"
 )
 
 // test-only helper (kept here to avoid changing the package API)

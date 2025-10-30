@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
-	errC "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
+	errC "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/errors"
 )
 
 // -----------------------------------------------------------------------------

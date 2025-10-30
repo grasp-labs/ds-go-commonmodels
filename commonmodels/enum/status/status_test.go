@@ -3,7 +3,7 @@ package status_test
 import (
 	"testing"
 
-	st "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/status"
+	st "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/status"
 )
 
 // Test for validating Locations.

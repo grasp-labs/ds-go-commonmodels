@@ -9,11 +9,11 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	errC "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/errors"
-	status "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/enum/status"
-	types "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/types"
-	verr "github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validation_error"
-	"github.com/grasp-labs/ds-go-commonmodels/v2/commonmodels/validators/email"
+	errC "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/errors"
+	status "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/status"
+	types "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/types"
+	verr "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
+	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validators/email"
 )
 
 // Now returns the current time in UTC.
