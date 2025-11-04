@@ -98,6 +98,8 @@ func (e *HTTPError) Status() int {
 		return http.StatusConflict
 	case errC.TooManyRequests:
 		return http.StatusTooManyRequests
+	case errC.BadGateway:
+		return http.StatusBadGateway
 	default:
 		return http.StatusInternalServerError
 	}
@@ -135,6 +137,14 @@ func Internal(requestID string, msg string) *HTTPError {
 		msg = "internal server error"
 	}
 	return NewHTTPError(requestID, errC.Internal, msg, http.StatusInternalServerError)
+}
+
+// BadGateway returns a 502 Bad Gateway Error.
+func BadGateway(requestID string, msg string) *HTTPError {
+	if msg == "" {
+		msg = errC.HumanMessage(errC.BadGateway)
+	}
+	return NewHTTPError(requestID, errC.BadGateway, msg, http.StatusBadGateway)
 }
 
 // Unauthorized returns a 401 Unauthorized error.
