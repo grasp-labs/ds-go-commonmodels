@@ -36,6 +36,7 @@ const (
 	InvalidStatus      = "invalid_status"
 	Invalid            = "invalid"
 	InvalidDataType    = "invalid_data_type"
+	BadGateway         = "bad_gateway"
 )
 
 // -----------------------------------------------------------------------------
@@ -57,6 +58,7 @@ var messagesEN = map[string]string{
 	InvalidStatus:      "The provided status %s is invalid. Allowed values include active, deleted, suspended, rejected, draft",
 	Invalid:            "Invalid",
 	InvalidDataType:    "The provided data type %s is invalid. Allowed values include string, int64, float64, decimal, time, datetime, bytes, uuid, map",
+	BadGateway:         "The server received an invalid response from an upstream service. Please try again later.",
 }
 
 // -----------------------------------------------------------------------------
@@ -78,6 +80,7 @@ var messagesNB = map[string]string{
 	InvalidStatus:      "Oppgitt statusverdi er ugyldig. Gyldige verdier inkluderer active, deleted, suspended, rejected, draft",
 	Invalid:            "Ugyldig",
 	InvalidDataType:    "Oppgitt datatypeverdi er ugyldig. Gyldige verdier inkluderer string, int64, float64, decimal, time, datetime, bytes, uuid, map",
+	BadGateway:         "Serveren mottok et ugyldig svar fra en ekstern tjeneste. Prøv igjen senere.",
 }
 
 // -----------------------------------------------------------------------------
@@ -138,6 +141,7 @@ var statusByCode = map[string]int{
 	InvalidJSONFormat:  http.StatusBadRequest,
 	InvalidStatus:      http.StatusBadRequest,
 	Invalid:            http.StatusBadRequest,
+	BadGateway:         http.StatusBadGateway,
 }
 
 func StatusFor(code string) int {

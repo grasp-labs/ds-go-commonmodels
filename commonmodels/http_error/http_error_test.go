@@ -284,3 +284,69 @@ func TestWithRetry(t *testing.T) {
 		t.Fatalf("expected retryAfter to be 90, got %d", retryAfter)
 	}
 }
+func TestBadGateway_DefaultMessage(t *testing.T) {
+	requestID := uuid.MustParse("31ac4e2a-10a1-471d-ac7c-fd6ee13a526d").String()
+	httpErr := he.BadGateway(requestID, "")
+	status := httpErr.Status()
+	if status != http.StatusBadGateway {
+		t.Fatalf("expected %d, got %d", http.StatusBadGateway, status)
+	}
+	jsonBytes, err := json.Marshal(httpErr)
+	if err != nil {
+		t.Fatalf("did not expect json marshal error, err: %v", err)
+	}
+	expected := `{"code":"bad_gateway","message":"The server received an invalid response from an upstream service. Please try again later.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
+	if string(jsonBytes) != expected {
+		t.Fatalf("failed to marshal struct, got %s, expected %s", string(jsonBytes), expected)
+	}
+	statusCode, headers, hErr := httpErr.Response()
+	if statusCode != http.StatusBadGateway {
+		t.Fatalf("expected %d, got %d", http.StatusBadGateway, statusCode)
+	}
+	if retryHeader := headers.Get("Retry-After"); retryHeader != "" {
+		t.Fatalf("expected empty Retry-After header, got %s", retryHeader)
+	}
+	if hErr.Code != "bad_gateway" {
+		t.Fatalf("expected bad_gateway, got %s", hErr.Code)
+	}
+	if hErr.Message != "The server received an invalid response from an upstream service. Please try again later." {
+		t.Fatalf("expected The server received an invalid response from an upstream service. Please try again later., got %s", hErr.Message)
+	}
+	if _, err := uuid.Parse(hErr.RequestID); err != nil {
+		t.Fatalf("failed to parse, err: %v", err)
+	}
+}
+
+func TestBadGateway_CustomMessage(t *testing.T) {
+	requestID := uuid.MustParse("31ac4e2a-10a1-471d-ac7c-fd6ee13a526d").String()
+	customMsg := "custom bad gateway error"
+	httpErr := he.BadGateway(requestID, customMsg)
+	status := httpErr.Status()
+	if status != http.StatusBadGateway {
+		t.Fatalf("expected %d, got %d", http.StatusBadGateway, status)
+	}
+	jsonBytes, err := json.Marshal(httpErr)
+	if err != nil {
+		t.Fatalf("did not expect json marshal error, err: %v", err)
+	}
+	expected := `{"code":"bad_gateway","message":"custom bad gateway error","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
+	if string(jsonBytes) != expected {
+		t.Fatalf("failed to marshal struct, got %s, expected %s", string(jsonBytes), expected)
+	}
+	statusCode, headers, hErr := httpErr.Response()
+	if statusCode != http.StatusBadGateway {
+		t.Fatalf("expected %d, got %d", http.StatusBadGateway, statusCode)
+	}
+	if retryHeader := headers.Get("Retry-After"); retryHeader != "" {
+		t.Fatalf("expected empty Retry-After header, got %s", retryHeader)
+	}
+	if hErr.Code != "bad_gateway" {
+		t.Fatalf("expected bad_gateway, got %s", hErr.Code)
+	}
+	if hErr.Message != customMsg {
+		t.Fatalf("expected %s, got %s", customMsg, hErr.Message)
+	}
+	if _, err := uuid.Parse(hErr.RequestID); err != nil {
+		t.Fatalf("failed to parse, err: %v", err)
+	}
+}
