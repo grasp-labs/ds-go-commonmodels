@@ -21,7 +21,7 @@ func TestHttpError_NotFound(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr := string(jsonBytes)
-	expected := `{"code":"not_found","message":"not found","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
+	expected := `{"code":"not_found","message":"The requested resource was not found.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -41,7 +41,7 @@ func TestHttpError_NotFound(t *testing.T) {
 	if hErr.Code != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Code)
 	}
-	expect = "not found"
+	expect = "The requested resource was not found."
 	if hErr.Message != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Code)
 	}
@@ -54,7 +54,7 @@ func TestHttpError_NotFound(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr = string(jsonBytes)
-	expected = `{"code":"not_found","message":"not found","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
+	expected = `{"code":"not_found","message":"The requested resource was not found.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -187,7 +187,7 @@ func TestTooManyRequests(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr := string(jsonBytes)
-	expected := `{"code":"too_many_requests","message":"too many requests","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":60}`
+	expected := `{"code":"too_many_requests","message":"Too many requests. Please slow down.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":60}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -203,7 +203,7 @@ func TestTooManyRequests(t *testing.T) {
 	if hErr.Code != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Code)
 	}
-	expect = "too many requests"
+	expect = "Too many requests. Please slow down."
 	if hErr.Message != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
@@ -216,7 +216,7 @@ func TestTooManyRequests(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr = string(jsonBytes)
-	expected = `{"code":"too_many_requests","message":"too many requests","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":60}`
+	expected = `{"code":"too_many_requests","message":"Too many requests. Please slow down.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":60}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -242,7 +242,7 @@ func TestWithRetry(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr := string(jsonBytes)
-	expected := `{"code":"too_many_requests","message":"too many requests","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":90}`
+	expected := `{"code":"too_many_requests","message":"Too many requests. Please slow down.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":90}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -258,7 +258,7 @@ func TestWithRetry(t *testing.T) {
 	if hErr.Code != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Code)
 	}
-	expect = "too many requests"
+	expect = "Too many requests. Please slow down."
 	if hErr.Message != expect {
 		t.Fatalf("expected %s, got %s", expect, hErr.Message)
 	}
@@ -271,7 +271,7 @@ func TestWithRetry(t *testing.T) {
 		t.Fatalf("did not expect json marshal error, err: %v", err)
 	}
 	jsonStr = string(jsonBytes)
-	expected = `{"code":"too_many_requests","message":"too many requests","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":90}`
+	expected = `{"code":"too_many_requests","message":"Too many requests. Please slow down.","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":true,"retry_after":90}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
 	}
@@ -348,5 +348,135 @@ func TestBadGateway_CustomMessage(t *testing.T) {
 	}
 	if _, err := uuid.Parse(hErr.RequestID); err != nil {
 		t.Fatalf("failed to parse, err: %v", err)
+	}
+}
+func TestGetLocale(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  []string
+		expect string
+	}{
+		{"no locale", []string{}, "en"},
+		{"empty locale", []string{""}, "en"},
+		{"single locale", []string{"fr"}, "fr"},
+		{"multiple locales", []string{"es", "de"}, "es"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := he.GetLocale(tt.input...)
+			if got != tt.expect {
+				t.Fatalf("expected %s, got %s", tt.expect, got)
+			}
+		})
+	}
+}
+
+func TestInternal_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.Internal(requestID, "")
+	if httpErr.Code != "internal_error" {
+		t.Fatalf("expected code internal_error, got %s", httpErr.Code)
+	}
+	if httpErr.Message == "" {
+		t.Fatalf("expected non-empty message")
+	}
+	if httpErr.RequestID != requestID {
+		t.Fatalf("expected requestID %s, got %s", requestID, httpErr.RequestID)
+	}
+	if httpErr.Status() != http.StatusInternalServerError {
+		t.Fatalf("expected status %d, got %d", http.StatusInternalServerError, httpErr.Status())
+	}
+}
+
+func TestInternal_CustomMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	msg := "custom internal error"
+	httpErr := he.Internal(requestID, msg)
+	if httpErr.Message != msg {
+		t.Fatalf("expected message %s, got %s", msg, httpErr.Message)
+	}
+}
+
+func TestPartialContent_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.PartialContent(requestID, "")
+	if httpErr.Code != "partial_content" {
+		t.Fatalf("expected code partial_content, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusPartialContent {
+		t.Fatalf("expected status %d, got %d", http.StatusPartialContent, httpErr.Status())
+	}
+}
+
+func TestUnauthorized_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.Unauthorized(requestID, "")
+	if httpErr.Code != "unauthorized" {
+		t.Fatalf("expected code unauthorized, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusUnauthorized {
+		t.Fatalf("expected status %d, got %d", http.StatusUnauthorized, httpErr.Status())
+	}
+}
+
+func TestForbidden_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.Forbidden(requestID, "")
+	if httpErr.Code != "forbidden" {
+		t.Fatalf("expected code forbidden, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusForbidden {
+		t.Fatalf("expected status %d, got %d", http.StatusForbidden, httpErr.Status())
+	}
+}
+
+func TestConflict_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.Conflict(requestID, "")
+	if httpErr.Code != "conflict" {
+		t.Fatalf("expected code conflict, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusConflict {
+		t.Fatalf("expected status %d, got %d", http.StatusConflict, httpErr.Status())
+	}
+}
+
+func TestServiceUnavailable_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.ServiceUnavailable(requestID, "")
+	if httpErr.Code != "service_unavailable" {
+		t.Fatalf("expected code service_unavailable, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusServiceUnavailable {
+		t.Fatalf("expected status %d, got %d", http.StatusServiceUnavailable, httpErr.Status())
+	}
+	if !httpErr.Recoverable {
+		t.Fatalf("expected recoverable true")
+	}
+	if httpErr.RetryAfter != 30 {
+		t.Fatalf("expected retry_after 30, got %d", httpErr.RetryAfter)
+	}
+}
+
+func TestCreated_DefaultMessage(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.Created(requestID, "")
+	if httpErr.Code != "created" {
+		t.Fatalf("expected code created, got %s", httpErr.Code)
+	}
+	if httpErr.Status() != http.StatusCreated {
+		t.Fatalf("expected status %d, got %d", http.StatusCreated, httpErr.Status())
+	}
+}
+
+func TestLocaleOverride(t *testing.T) {
+	requestID := uuid.New().String()
+	httpErr := he.NotFound(requestID, "", "nb")
+	if httpErr.Code != "not_found" {
+		t.Fatalf("expected code not_found, got %s", httpErr.Code)
+	}
+	expected := "Forespurt ressurs ble ikke funnet."
+	if httpErr.Message != expected {
+		t.Fatalf("expected message %q, got %q", expected, httpErr.Message)
 	}
 }
