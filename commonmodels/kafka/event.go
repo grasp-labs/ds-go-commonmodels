@@ -1,6 +1,9 @@
 package event
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
 	"regexp"
 	"strings"
 	"time"
@@ -47,6 +50,24 @@ type Event struct {
 	// Context has to be json - Typically a bearer of processing information for consumers
 	Context    *types.JSONB[map[string]any] `gorm:"type:jsonb" json:"context,omitempty"`
 	ContextURI *string                      `json:"context_uri,omitempty"`
+}
+
+// HashPayloadMD5 computes an MD5 hash of the event's Payload
+// and sets e.MD5Hash to the hex-encoded result.
+// Returns an error if JSON marshalling fails.
+func (e *Event) HashPayloadMD5() error {
+	if e.Payload == nil {
+		e.MD5Hash = ""
+		return nil
+	}
+	// Convert JSONB wrapper to raw JSON bytes
+	b, err := json.Marshal(e.Payload)
+	if err != nil {
+		return err
+	}
+	sum := md5.Sum(b)
+	e.MD5Hash = hex.EncodeToString(sum[:])
+	return nil
 }
 
 // Validate checks required fields, status values, and JSONB shape.
