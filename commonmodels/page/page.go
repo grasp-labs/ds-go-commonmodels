@@ -6,6 +6,7 @@ import (
 
 const (
 	DefaultPageSize = 20
+	DefaultOffset   = 0
 )
 
 type Page struct {
@@ -69,6 +70,23 @@ func Compute(total int64, page, pageSize int) Page {
 		HasPrev:    totalPages > 0 && page > 1,
 		HasNext:    totalPages > 0 && int64(page) < totalPages,
 	}
+}
+
+func CalculatePage(limit, offset, total int64) Page {
+	// Set pageSize from limit, if limit is zero or negative, use default
+	pageSize := int(limit)
+	if pageSize <= 0 {
+		pageSize = DefaultPageSize
+	}
+
+	// Ensure offset is non-negative
+	if offset < 0 {
+		offset = DefaultOffset
+	}
+
+	page := int(offset)/pageSize + 1
+
+	return Compute(total, page, pageSize)
 }
 
 // Generic response envelope: works for any element type T,

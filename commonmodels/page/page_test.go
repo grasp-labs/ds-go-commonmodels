@@ -63,3 +63,28 @@ func TestPage_NewResponseXL(t *testing.T) {
 	assert.Equal(t, r.Page.Total, int64(500))
 	assert.Equal(t, len(r.Data), r.Page.PageSize)
 }
+
+func TestCalculatePage(t *testing.T) {
+	limit := int64(25)
+	offset := int64(50)
+	total := int64(200)
+
+	page := page.CalculatePage(limit, offset, total)
+	assert.Equal(t, 3, page.Page)
+	assert.Equal(t, 25, page.PageSize)
+	assert.Equal(t, int64(200), page.Total)
+	assert.Equal(t, int64(8), page.TotalPages)
+	assert.Equal(t, true, page.HasPrev)
+	assert.Equal(t, true, page.HasNext)
+}
+
+func TestCalculatePage_Defaults(t *testing.T) {
+	limit := int64(0)
+	offset := int64(-5)
+	total := int64(100)
+
+	page := page.CalculatePage(limit, offset, total)
+	assert.Equal(t, 1, page.Page)
+	assert.Equal(t, 20, page.PageSize)
+	assert.Equal(t, int64(100), page.Total)
+}
