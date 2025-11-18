@@ -71,7 +71,6 @@ func TestCalculatePage(t *testing.T) {
 	total := int64(200)
 
 	page := page.CalculatePage(limit, offset, total)
-	fmt.Println(page)
 	assert.Equal(t, 3, page.Page)
 	assert.Equal(t, 25, page.PageSize)
 	assert.Equal(t, int64(200), page.Total)
