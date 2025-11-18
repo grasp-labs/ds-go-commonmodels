@@ -71,6 +71,22 @@ func Compute(total int64, page, pageSize int) Page {
 	}
 }
 
+func CalculatePage(limit, offset, total int64) Page {
+	// Set pageSize from limit, if limit is zero or negative, use default
+	pageSize := int(limit)
+	if pageSize <= 0 {
+		pageSize = DefaultPageSize
+	}
+
+	// If offset is zero or negative, page is 1
+	page := 1
+	if pageSize > 0 {
+		page = int(offset)/pageSize + 1
+	}
+
+	return Compute(total, page, pageSize)
+}
+
 // Generic response envelope: works for any element type T,
 // e.g. should support any datamodel we choose to implement.
 type Response[T any] struct {
