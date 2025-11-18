@@ -2,7 +2,6 @@ package page_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	page "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/page"
@@ -71,11 +70,21 @@ func TestCalculatePage(t *testing.T) {
 	total := int64(200)
 
 	page := page.CalculatePage(limit, offset, total)
-	fmt.Println(page)
 	assert.Equal(t, 3, page.Page)
 	assert.Equal(t, 25, page.PageSize)
 	assert.Equal(t, int64(200), page.Total)
 	assert.Equal(t, int64(8), page.TotalPages)
 	assert.Equal(t, true, page.HasPrev)
 	assert.Equal(t, true, page.HasNext)
+}
+
+func TestCalculatePage_Defaults(t *testing.T) {
+	limit := int64(0)
+	offset := int64(-5)
+	total := int64(100)
+
+	page := page.CalculatePage(limit, offset, total)
+	assert.Equal(t, 1, page.Page)
+	assert.Equal(t, 20, page.PageSize)
+	assert.Equal(t, int64(100), page.Total)
 }

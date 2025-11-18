@@ -6,6 +6,7 @@ import (
 
 const (
 	DefaultPageSize = 20
+	DefaultOffset   = 0
 )
 
 type Page struct {
@@ -76,6 +77,11 @@ func CalculatePage(limit, offset, total int64) Page {
 	pageSize := int(limit)
 	if pageSize <= 0 {
 		pageSize = DefaultPageSize
+	}
+
+	// Ensure offset is non-negative
+	if offset < 0 {
+		offset = DefaultOffset
 	}
 
 	// If offset is zero or negative, page is 1
