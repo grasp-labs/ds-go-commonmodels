@@ -84,11 +84,7 @@ func CalculatePage(limit, offset, total int64) Page {
 		offset = DefaultOffset
 	}
 
-	// If offset is zero or negative, page is 1
-	page := 1
-	if pageSize > 0 {
-		page = int(offset)/pageSize + 1
-	}
+	page := int(offset)/pageSize + 1
 
 	return Compute(total, page, pageSize)
 }
