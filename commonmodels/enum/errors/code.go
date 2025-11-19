@@ -88,6 +88,7 @@ const (
 	LoopDetected                = "loop_detected"
 	NotExtended                 = "not_extended"
 	NetworkAuthRequired         = "network_auth_required"
+	RequirePositiveInt          = "require_positive_int"
 )
 
 // -----------------------------------------------------------------------------
@@ -161,6 +162,7 @@ var messagesEN = map[string]string{
 	LoopDetected:                "Loop detected.",
 	NotExtended:                 "Not extended.",
 	NetworkAuthRequired:         "Network authentication required.",
+	RequirePositiveInt:          "Integer must be positive",
 }
 
 // -----------------------------------------------------------------------------
@@ -234,6 +236,7 @@ var messagesNB = map[string]string{
 	LoopDetected:                "Sløyfe oppdaget.",
 	NotExtended:                 "Ikke utvidet.",
 	NetworkAuthRequired:         "Nettverksautentisering kreves.",
+	RequirePositiveInt:          "Heltallet må være positivt.",
 }
 
 // -----------------------------------------------------------------------------
@@ -346,6 +349,7 @@ var statusByCode = map[string]int{
 	LoopDetected:                508,
 	NotExtended:                 510,
 	NetworkAuthRequired:         511,
+	RequirePositiveInt:          http.StatusBadRequest,
 }
 
 func StatusFor(code string) int {
