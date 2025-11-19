@@ -162,7 +162,7 @@ var messagesEN = map[string]string{
 	LoopDetected:                "Loop detected.",
 	NotExtended:                 "Not extended.",
 	NetworkAuthRequired:         "Network authentication required.",
-	RequirePositiveInt:          "Integer must be positive",
+	RequirePositiveInt:          "Integer must be positive.",
 }
 
 // -----------------------------------------------------------------------------
