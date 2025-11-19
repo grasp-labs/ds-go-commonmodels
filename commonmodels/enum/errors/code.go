@@ -15,6 +15,7 @@ package errors
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 )
 
 // -----------------------------------------------------------------------------
@@ -280,6 +281,29 @@ func HumanMessageLocale(locale, code string, args ...any) string {
 		return fmt.Sprintf(msg, args...)
 	}
 	return msg
+}
+
+type CustomMessage struct {
+	En string
+	No string
+}
+
+func CustomHumanMessageLocale(locale string, c CustomMessage) string {
+	opts := map[string]string{
+		"en": "En",
+		"no": "No",
+	}
+	var upperLocale string
+	upperLocale, ok := opts[locale]
+	if !ok {
+		upperLocale = "En"
+	}
+	r := reflect.ValueOf(c)
+	v := r.FieldByName(upperLocale)
+	if v.IsValid() {
+		return v.String()
+	}
+	return c.En
 }
 
 // (Optional) map codes to HTTP status for consistent responses.
