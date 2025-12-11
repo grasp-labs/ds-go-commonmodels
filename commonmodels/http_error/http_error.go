@@ -704,14 +704,14 @@ func NotExtended(requestID, msg string, locale ...string) *HTTPError {
 	return NewHTTPError(requestID, errC.NotExtended, msg, 510)
 }
 
-// NetworkAuthRequired returns a 511 Network Authentication Required response.
+// NetworkAuthenticationRequired returns a 511 Network Authentication Required response.
 // Locale is optional; defaults to "en".
-func NetworkAuthRequired(requestID, msg string, locale ...string) *HTTPError {
+func NetworkAuthenticationRequired(requestID, msg string, locale ...string) *HTTPError {
 	loc := GetLocale(locale...)
 	if msg == "" {
-		msg = errC.HumanMessageLocale(loc, errC.NetworkAuthRequired)
+		msg = errC.HumanMessageLocale(loc, errC.NetworkAuthenticationRequired)
 	}
-	return NewHTTPError(requestID, errC.NetworkAuthRequired, msg, 511)
+	return NewHTTPError(requestID, errC.NetworkAuthenticationRequired, msg, 511)
 }
 
 // FromError converts any error into an *HTTPError.
