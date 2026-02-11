@@ -39,14 +39,14 @@ var ErrValidation = errors.New("validation error")
 //
 // Typical usage in service layer:
 //
-//	env := validation_error.New()
-//	env.Append(validation_error.ValidationError{
+//	envelope := validation_error.New()
+//	envelope.Append(validation_error.ValidationError{
 //	    Field:   "email",
 //	    Message: "invalid email format",
 //	    Loc:     "body",
 //	    Code:    "invalid",
 //	})
-//	return env
+//	return envelope
 //
 // Typical usage in HTTP handler:
 //
