@@ -96,3 +96,16 @@ func TestEnvelopeCanBeRetrieved(t *testing.T) {
 		t.Fatalf("expected validation error envelope")
 	}
 }
+
+func TestExtract(t *testing.T) {
+	err := throwErr()
+	env, ok := ve.Extract(err)
+	if !ok {
+		t.Fatalf("expected ok, got %v, %v", env, ok)
+	}
+	msg := env.Error()
+	if msg != "validation error" {
+		t.Fatalf("expected validation error, got %s", msg)
+	}
+
+}
