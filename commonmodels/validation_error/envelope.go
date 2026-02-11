@@ -100,13 +100,13 @@ func (e *ErrorEnvelope) Append(v ValidationError) {
 
 // Extract convenience helper
 //
-//	if env, ok := ve.Extract(err); ok {
-//	   fmt.Println(env.Details)
+//	if envelope, ok := ve.Extract(err); ok {
+//	   fmt.Println(envelope.Details)
 //	}
 func Extract(err error) (*ErrorEnvelope, bool) {
-	var env *ErrorEnvelope
-	if errors.As(err, &env) {
-		return env, true
+	var envelope *ErrorEnvelope
+	if errors.As(err, &envelope) {
+		return envelope, true
 	}
 	return nil, false
 }

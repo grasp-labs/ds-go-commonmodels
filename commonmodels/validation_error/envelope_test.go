@@ -78,11 +78,7 @@ func TestErrorIs(t *testing.T) {
 func TestErrorAs(t *testing.T) {
 	err := throwErr()
 	var errEnvelope *ve.ErrorEnvelope
-	var isEnv = false
-	if errors.As(err, &errEnvelope) {
-		isEnv = true
-	}
-	assert.True(t, isEnv)
+	assert.True(t, errors.As(err, &errEnvelope))
 }
 
 func TestEnvelopeCanBeRetrieved(t *testing.T) {
