@@ -2,9 +2,11 @@ package validation_error_test
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 
 	ve "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEnvelope_WrapValidationErrorAndMarshal(t *testing.T) {
@@ -59,5 +61,38 @@ func TestEnvelope_MarshalEmptySlice(t *testing.T) {
 	expected := `{"details":[]}`
 	if jsonStr != expected {
 		t.Fatalf("failed to marshal struct, got %s, expected %s", jsonStr, expected)
+	}
+}
+
+func throwErr() error {
+	env := ve.New()
+	env.Append(ve.ValidationError{Field: "email", Message: "invalid", Loc: string(ve.Body), Code: "invalid"})
+	return env
+}
+
+func TestErrorIs(t *testing.T) {
+	err := throwErr()
+	assert.True(t, errors.Is(err, ve.ErrValidation))
+}
+
+func TestErrorAs(t *testing.T) {
+	err := throwErr()
+	var errEnvelope *ve.ErrorEnvelope
+	var isEnv = false
+	if errors.As(err, &errEnvelope) {
+		isEnv = true
+	}
+	assert.True(t, isEnv)
+}
+
+func TestEnvelopeCanBeRetrieved(t *testing.T) {
+	err := throwErr()
+	var env *ve.ErrorEnvelope
+	if errors.As(err, &env) {
+		if len(env.Details) != 1 {
+			t.Fatalf("expected 1 validation error, got: %v", env)
+		}
+	} else {
+		t.Fatalf("expected validation error envelope")
 	}
 }
