@@ -11,17 +11,17 @@ const (
 
 type Page struct {
 	// Page number (1-based)
-	Page int `json:"page"`
+	Page int `json:"page" validate:"required"`
 	// Items per page
-	PageSize int `json:"page_size"`
+	PageSize int `json:"page_size" validate:"required"`
 	// Total items
-	Total int64 `json:"total"`
+	Total int64 `json:"total" validate:"required"`
 	// Total pages (derived)
-	TotalPages int64 `json:"total_pages"`
+	TotalPages int64 `json:"total_pages" validate:"required"`
 	// Is there a previous page
-	HasPrev bool `json:"has_prev"`
+	HasPrev bool `json:"has_prev" validate:"required"`
 	// Is there a next page
-	HasNext bool `json:"has_next"`
+	HasNext bool `json:"has_next" validate:"required"`
 }
 
 // Sanitize normalizes inputs and enforces minimal bounds.
