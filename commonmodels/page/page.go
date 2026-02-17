@@ -92,8 +92,8 @@ func CalculatePage(limit, offset, total int64) Page {
 // Generic response envelope: works for any element type T,
 // e.g. should support any datamodel we choose to implement.
 type Response[T any] struct {
-	Data []T  `json:"data"`
-	Page Page `json:"page"`
+	Data []T  `json:"data" validate:"required"`
+	Page Page `json:"page" validate:"required"`
 }
 
 // Convenience constructor.
