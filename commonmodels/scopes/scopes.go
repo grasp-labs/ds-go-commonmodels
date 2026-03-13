@@ -68,7 +68,7 @@ func QueryParamScopes(params map[string]string) []Scope {
 
 // Field creates an equality scope. Zero values are no-ops.
 func Field(fieldName string, value interface{}) Scope {
-	if IsZero(value) {
+	if strings.TrimSpace(fieldName) == "" || IsZero(value) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
@@ -162,12 +162,18 @@ func Paginate(limit int, offset int) Scope {
 // JSONBContains creates a scope to search for a key-value pair within a JSONB field.
 // For example: JSONBContains("metadata", "env", "production") searches where metadata->>'env' = 'production'
 func JSONBContains(fieldName, key, value string) Scope {
-	if key == "" || value == "" {
+	if key == "" || value == "" || strings.TrimSpace(fieldName) == "" {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
-		// Using JSONB ->> operator for text value comparison
-		return tx.Where(fieldName+" ->> ? = ?", key, value)
+		return tx.Where(clause.Expr{
+			SQL: "? ->> ? = ?",
+			Vars: []interface{}{
+				clause.Column{Table: clause.CurrentTable, Name: fieldName},
+				key,
+				value,
+			},
+		})
 	}
 }
 
@@ -186,11 +192,17 @@ func JSONBHasKey(fieldName, key string) Scope {
 // JSONBContainsValue creates a scope to search all keys in a JSONB field for a specific value.
 // For example: JSONBContainsValue("metadata", "production") searches where any value in metadata equals 'production'
 func JSONBContainsValue(fieldName, value string) Scope {
-	if fieldName == "" || value == "" {
+	if strings.TrimSpace(fieldName) == "" || value == "" {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
-		return tx.Where("EXISTS (SELECT 1 FROM jsonb_each_text("+fieldName+") AS kv WHERE kv.value = ?)", value)
+		return tx.Where(clause.Expr{
+			SQL: "EXISTS (SELECT 1 FROM jsonb_each_text(?) AS kv WHERE kv.value = ?)",
+			Vars: []interface{}{
+				clause.Column{Table: clause.CurrentTable, Name: fieldName},
+				value,
+			},
+		})
 	}
 }
 

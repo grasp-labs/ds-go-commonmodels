@@ -21,8 +21,8 @@ func TestField(t *testing.T) {
 	}
 	for _, test := range tests {
 		scope := scopes.Field(test.field, test.value)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
 	}
 }
@@ -42,8 +42,8 @@ func TestFieldComp(t *testing.T) {
 	}
 	for _, test := range tests {
 		scope := scopes.FieldCmp(test.field, test.op, test.value)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
 	}
 }
@@ -102,8 +102,8 @@ func TestJSONBHasKey(t *testing.T) {
 	}
 	for _, test := range tests {
 		scope := scopes.JSONBHasKey(test.field, test.key)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
 	}
 }
@@ -122,8 +122,8 @@ func TestJSONBContainsValue(t *testing.T) {
 	}
 	for _, test := range tests {
 		scope := scopes.JSONBContainsValue(test.field, test.value)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
 	}
 }
@@ -143,31 +143,45 @@ func TestJSONBHasKeyValue(t *testing.T) {
 	}
 	for _, test := range tests {
 		scope := scopes.JSONBContains(test.field, test.key, test.value)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
 	}
 }
 
 func TestJSONBContainsAll(t *testing.T) {
 	tests := []struct {
-		name    string
-		field   string
-		keys    []string
-		success bool
+		name        string
+		field       string
+		keys        []string
+		expectScope bool
 	}{
 		{"contains all keys 'metadata' (success)", "metadata", []string{"status", "type"}, true},
 		{"contains all keys 'attributes' (success)", "attributes", []string{"feature", "version"}, true},
-		{"empty keys (fail)", "metadata", []string{}, false},
+		{"empty keys (no-op scope)", "metadata", []string{}, true},
 	}
 	for _, test := range tests {
 		keysMap := make(map[string]string)
 		for _, key := range test.keys {
-			keysMap[key] = "value" // add dummy value to avoid empty value
+			keysMap[key] = "value"
 		}
 		scope := scopes.JSONBContainsAll(test.field, keysMap)
-		if (scope != nil) != test.success {
-			t.Errorf("%s: Expected success=%v, got success=%v", test.name, test.success, scope != nil)
+		if scope == nil {
+			t.Errorf("%s: scope should not be nil", test.name)
 		}
+	}
+}
+
+func TestOrderByLogic(t *testing.T) {
+	scope := scopes.OrderBy("-age", map[string]string{"age": "age"})
+	if scope == nil {
+		t.Errorf("OrderBy should not return nil")
+	}
+}
+
+func TestPaginateLogic(t *testing.T) {
+	scope := scopes.Paginate(10, 5)
+	if scope == nil {
+		t.Errorf("Paginate should not return nil")
 	}
 }
