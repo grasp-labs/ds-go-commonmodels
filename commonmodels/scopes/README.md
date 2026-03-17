@@ -14,7 +14,7 @@ The **scopes** package provides composable query scopes for GORM, enabling flexi
 
 ## Usage
 
-The usage here is quite flexible, you can utilize the different Scope functions directly from the library if you need single off values, and if you need complex combination of scopes it's easy to build an adapter to combine whatever you need for the Scopes in your different handlers.
+The usage here is quite flexible. You can utilize the different Scope functions directly from the library for one-off scopes, and for complex combinations of scopes it's easy to build an adapter to combine whatever you need in your different handlers.
 
 ### Direct usage:
 

@@ -2,6 +2,8 @@ package scopes
 
 import (
 	"reflect"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +14,15 @@ import (
 )
 
 type Scope = func(*gorm.DB) *gorm.DB
+
+// isValidIdentifier checks if a string is a valid SQL identifier.
+// Valid identifiers must start with a letter or underscore, followed by letters, digits, or underscores.
+// This enforces SQL naming standards and prevents injection attacks on field names.
+var validIdentifierRegex = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`)
+
+func isValidIdentifier(s string) bool {
+	return validIdentifierRegex.MatchString(strings.TrimSpace(s))
+}
 
 // TankScope is a helper to create scopes for queries based on common query parameters.
 func TankScope(params map[string]string) []Scope {
@@ -46,12 +57,19 @@ func TankScope(params map[string]string) []Scope {
 
 // QueryParamScopes creates scopes from a map of field names to values.
 // For each field, it tries to parse as UUID first, then falls back to string.
-// Empty values are skipped (no-op).
+// Empty values are skipped (no-op). Fields are processed in sorted order for deterministic output.
 func QueryParamScopes(params map[string]string) []Scope {
 	var scopes []Scope
 
-	for field, val := range params {
-		val = strings.TrimSpace(val)
+	// Sort keys for deterministic scope ordering and stable SQL generation
+	keys := make([]string, 0, len(params))
+	for field := range params {
+		keys = append(keys, field)
+	}
+	sort.Strings(keys)
+
+	for _, field := range keys {
+		val := strings.TrimSpace(params[field])
 		if val == "" {
 			continue
 		}
@@ -67,8 +85,9 @@ func QueryParamScopes(params map[string]string) []Scope {
 }
 
 // Field creates an equality scope. Zero values are no-ops.
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func Field(fieldName string, value interface{}) Scope {
-	if strings.TrimSpace(fieldName) == "" || IsZero(value) {
+	if !isValidIdentifier(fieldName) || IsZero(value) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
@@ -78,9 +97,10 @@ func Field(fieldName string, value interface{}) Scope {
 
 // FieldCmp creates a comparison scope (>=, <=, !=, etc.). Zero values are no-ops.
 // Only allows a whitelist of operators: =, !=, >, >=, <, <= to prevent SQL injection.
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func FieldCmp(fieldName string, operator string, value interface{}) Scope {
-	// Validate fieldName
-	if strings.TrimSpace(fieldName) == "" || IsZero(value) {
+	// Validate fieldName and value
+	if !isValidIdentifier(fieldName) || IsZero(value) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 
@@ -181,8 +201,9 @@ func Paginate(limit int, offset int) Scope {
 
 // JSONBContains creates a scope to search for a key-value pair within a JSONB field.
 // For example: JSONBContains("metadata", "env", "production") searches where metadata->>'env' = 'production'
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func JSONBContains(fieldName, key, value string) Scope {
-	if key == "" || value == "" || strings.TrimSpace(fieldName) == "" {
+	if key == "" || value == "" || !isValidIdentifier(fieldName) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
@@ -199,26 +220,25 @@ func JSONBContains(fieldName, key, value string) Scope {
 
 // JSONBHasKey creates a scope to check if a JSONB field has a specific key.
 // For example: JSONBHasKey("metadata", "env") searches where metadata ? 'env'
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func JSONBHasKey(fieldName, key string) Scope {
-	if key == "" || strings.TrimSpace(fieldName) == "" {
+	if key == "" || !isValidIdentifier(fieldName) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
-		// Using JSONB ? operator to check for key existence
-		return tx.Where(clause.Expr{
-			SQL: "? ? ?",
-			Vars: []interface{}{
-				clause.Column{Table: clause.CurrentTable, Name: fieldName},
-				key,
-			},
-		})
+		// Build the SQL with the ? operator as a literal.
+		// fieldName is validated as a valid identifier, then quoted by GORM.
+		// Only the key is parameterized to prevent injection.
+		quotedField := tx.Statement.Quote(fieldName)
+		return tx.Where(quotedField+" ? ?", key)
 	}
 }
 
 // JSONBContainsValue creates a scope to search all keys in a JSONB field for a specific value.
 // For example: JSONBContainsValue("metadata", "production") searches where any value in metadata equals 'production'
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func JSONBContainsValue(fieldName, value string) Scope {
-	if strings.TrimSpace(fieldName) == "" || value == "" {
+	if value == "" || !isValidIdentifier(fieldName) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
@@ -233,13 +253,22 @@ func JSONBContainsValue(fieldName, value string) Scope {
 }
 
 // JSONBContainsAll creates a scope to search for multiple key-value pairs in a JSONB field.
-// All pairs must match (AND logic).
+// All pairs must match (AND logic). Keys are sorted for deterministic SQL generation.
+// Validates fieldName to prevent SQL injection attacks on identifier names.
 func JSONBContainsAll(fieldName string, pairs map[string]string) Scope {
-	if len(pairs) == 0 || strings.TrimSpace(fieldName) == "" {
+	if len(pairs) == 0 || !isValidIdentifier(fieldName) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
-		for k, v := range pairs {
+		// Sort keys for deterministic SQL generation and better prepared statement reuse
+		keys := make([]string, 0, len(pairs))
+		for k := range pairs {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			v := pairs[k]
 			if v == "" {
 				continue
 			}
