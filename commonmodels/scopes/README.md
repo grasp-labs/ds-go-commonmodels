@@ -82,7 +82,7 @@ Adapter:
 ```go
 package repo
 
-import	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/scopes"
+import	cmScopes "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/scopes"
 
 // TenantID scopes to rows with the given tenant_id.
 func TenantID(t uuid.UUID) Scope {

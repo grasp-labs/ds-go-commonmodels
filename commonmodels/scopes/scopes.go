@@ -155,6 +155,9 @@ func Paginate(limit int, offset int) Scope {
 		if limit <= 0 {
 			limit = 100 // default limit
 		}
+		if offset < 0 {
+			offset = 0
+		}
 		return tx.Offset(offset).Limit(limit)
 	}
 }
@@ -180,12 +183,18 @@ func JSONBContains(fieldName, key, value string) Scope {
 // JSONBHasKey creates a scope to check if a JSONB field has a specific key.
 // For example: JSONBHasKey("metadata", "env") searches where metadata ? 'env'
 func JSONBHasKey(fieldName, key string) Scope {
-	if key == "" {
+	if key == "" || strings.TrimSpace(fieldName) == "" {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
 		// Using JSONB ? operator to check for key existence
-		return tx.Where(fieldName+" ? ?", key)
+		return tx.Where(clause.Expr{
+			SQL: "? ? ?",
+			Vars: []interface{}{
+				clause.Column{Table: clause.CurrentTable, Name: fieldName},
+				key,
+			},
+		})
 	}
 }
 
@@ -209,7 +218,7 @@ func JSONBContainsValue(fieldName, value string) Scope {
 // JSONBContainsAll creates a scope to search for multiple key-value pairs in a JSONB field.
 // All pairs must match (AND logic).
 func JSONBContainsAll(fieldName string, pairs map[string]string) Scope {
-	if len(pairs) == 0 {
+	if len(pairs) == 0 || strings.TrimSpace(fieldName) == "" {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
 	return func(tx *gorm.DB) *gorm.DB {
@@ -217,7 +226,14 @@ func JSONBContainsAll(fieldName string, pairs map[string]string) Scope {
 			if v == "" {
 				continue
 			}
-			tx = tx.Where(fieldName+" ->> ? = ?", k, v)
+			tx = tx.Where(clause.Expr{
+				SQL: "? ->> ? = ?",
+				Vars: []interface{}{
+					clause.Column{Table: clause.CurrentTable, Name: fieldName},
+					k,
+					v,
+				},
+			})
 		}
 		return tx
 	}
