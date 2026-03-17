@@ -7,7 +7,7 @@ The **scopes** package provides composable query scopes for GORM, enabling flexi
 - Composable Scopes: Build GORM queries using reusable functions
 - Dynamic Filtering: Create scopes from query parameters, including UUID, strings and timestamp fields
 - Comparison Operators: Support for equality and comparison (e.g., `>=`, `<=`) on fields
-- Ordering and Pagination: Safely order results and pagi ss snate within limit/offset
+- Ordering and Pagination: Safely order results and paginate within limit/offset
 - JSONB Helpers: Query JSONB fields for key value and key existence
 
 ---

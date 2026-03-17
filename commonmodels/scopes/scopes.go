@@ -77,10 +77,27 @@ func Field(fieldName string, value interface{}) Scope {
 }
 
 // FieldCmp creates a comparison scope (>=, <=, !=, etc.). Zero values are no-ops.
+// Only allows a whitelist of operators: =, !=, >, >=, <, <= to prevent SQL injection.
 func FieldCmp(fieldName string, operator string, value interface{}) Scope {
-	if IsZero(value) {
+	// Validate fieldName
+	if strings.TrimSpace(fieldName) == "" || IsZero(value) {
 		return func(tx *gorm.DB) *gorm.DB { return tx }
 	}
+
+	// Validate operator against whitelist to prevent SQL injection
+	allowedOperators := map[string]bool{
+		"=":  true,
+		"!=": true,
+		">":  true,
+		">=": true,
+		"<":  true,
+		"<=": true,
+	}
+	operator = strings.TrimSpace(operator)
+	if !allowedOperators[operator] {
+		return func(tx *gorm.DB) *gorm.DB { return tx }
+	}
+
 	return func(tx *gorm.DB) *gorm.DB {
 		return tx.Where("? "+operator+" ?", clause.Column{Table: clause.CurrentTable, Name: fieldName}, value)
 	}
