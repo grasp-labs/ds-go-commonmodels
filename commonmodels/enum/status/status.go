@@ -11,6 +11,7 @@ const (
 	Draft     Status = "draft"
 	Closed    Status = "closed"
 
+	New       ProcessStatus = "new"
 	Queued    ProcessStatus = "queued"
 	Running   ProcessStatus = "running"
 	Completed ProcessStatus = "completed"
@@ -42,6 +43,7 @@ var ValidStatus = map[Status]struct{}{
 // _, ok := ValidProcessStatus[s]
 // if !ok {...}
 var ValidProcessStatus = map[ProcessStatus]struct{}{
+	New:       {},
 	Queued:    {},
 	Running:   {},
 	Completed: {},

@@ -19,7 +19,7 @@ func TestValidationError_ValidStatus(t *testing.T) {
 }
 
 func TestValidationError_ValidProcessStatus(t *testing.T) {
-	locs := []string{"queued", "running", "completed", "failed", "cancelled"}
+	locs := []string{"new", "queued", "running", "completed", "failed", "cancelled"}
 
 	for _, l := range locs {
 		_, ok := st.ValidProcessStatus[st.ProcessStatus(l)]
