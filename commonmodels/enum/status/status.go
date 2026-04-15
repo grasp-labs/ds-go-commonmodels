@@ -1,6 +1,7 @@
 package status
 
 type Status string
+type ProcessStatus string
 
 const (
 	Active    Status = "active"
@@ -9,6 +10,12 @@ const (
 	Rejected  Status = "rejected"
 	Draft     Status = "draft"
 	Closed    Status = "closed"
+
+	Queued    ProcessStatus = "queued"
+	Running   ProcessStatus = "running"
+	Completed ProcessStatus = "completed"
+	Failed    ProcessStatus = "failed"
+	Cancelled ProcessStatus = "cancelled"
 )
 
 // Map of statuses that can be used to check if a status is valid,
@@ -25,4 +32,19 @@ var ValidStatus = map[Status]struct{}{
 	Rejected:  {},
 	Draft:     {},
 	Closed:    {},
+}
+
+// Map of statuses that can be used to check if a status is valid,
+//
+// Example:
+//
+// s := "hello"
+// _, ok := ValidProcessStatus[s]
+// if !ok {...}
+var ValidProcessStatus = map[ProcessStatus]struct{}{
+	Queued:    {},
+	Running:   {},
+	Completed: {},
+	Failed:    {},
+	Cancelled: {},
 }
