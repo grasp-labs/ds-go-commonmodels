@@ -45,7 +45,7 @@ var ValidStatus = map[Status]struct{}{
 // Example:
 //
 // s := "hello"
-// _, ok := ValidProcessStatus[s]
+// _, ok := ValidJobStatus[s]
 // if !ok {...}
 var ValidJobStatus = map[JobStatus]struct{}{
 	JobStatusNew:       {},
