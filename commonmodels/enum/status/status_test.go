@@ -8,7 +8,7 @@ import (
 
 // Test for validating Locations.
 func TestValidationError_ValidStatus(t *testing.T) {
-	locs := []string{"active", "deleted", "suspended", "rejected", "draft", "closed"}
+	locs := []string{"inactive", "active", "deleted", "suspended", "rejected", "draft", "closed"}
 
 	for _, l := range locs {
 		_, ok := st.ValidStatus[st.Status(l)]
@@ -22,7 +22,7 @@ func TestValidationError_ValidProcessStatus(t *testing.T) {
 	locs := []string{"new", "queued", "running", "completed", "failed", "cancelled"}
 
 	for _, l := range locs {
-		_, ok := st.ValidProcessStatus[st.ProcessStatus(l)]
+		_, ok := st.ValidJobStatus[st.JobStatus(l)]
 		if !ok {
 			t.Fatalf("expected %s to be ok, got error", l)
 		}

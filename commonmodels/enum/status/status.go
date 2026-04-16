@@ -1,22 +1,26 @@
 package status
 
 type Status string
-type ProcessStatus string
 
 const (
+	Inactive  Status = "inactive"
 	Active    Status = "active"
 	Deleted   Status = "deleted"
 	Suspended Status = "suspended"
 	Rejected  Status = "rejected"
 	Draft     Status = "draft"
 	Closed    Status = "closed"
+)
 
-	New       ProcessStatus = "new"
-	Queued    ProcessStatus = "queued"
-	Running   ProcessStatus = "running"
-	Completed ProcessStatus = "completed"
-	Failed    ProcessStatus = "failed"
-	Cancelled ProcessStatus = "cancelled"
+type JobStatus string
+
+const (
+	JobStatusNew       JobStatus = "new"
+	JobStatusQueued    JobStatus = "queued"
+	JobStatusRunning   JobStatus = "running"
+	JobStatusCompleted JobStatus = "completed"
+	JobStatusFailed    JobStatus = "failed"
+	JobStatusCancelled JobStatus = "cancelled"
 )
 
 // Map of statuses that can be used to check if a status is valid,
@@ -27,6 +31,7 @@ const (
 // _, ok := ValidStatus[s]
 // if !ok {...}
 var ValidStatus = map[Status]struct{}{
+	Inactive:  {},
 	Active:    {},
 	Deleted:   {},
 	Suspended: {},
@@ -42,11 +47,11 @@ var ValidStatus = map[Status]struct{}{
 // s := "hello"
 // _, ok := ValidProcessStatus[s]
 // if !ok {...}
-var ValidProcessStatus = map[ProcessStatus]struct{}{
-	New:       {},
-	Queued:    {},
-	Running:   {},
-	Completed: {},
-	Failed:    {},
-	Cancelled: {},
+var ValidJobStatus = map[JobStatus]struct{}{
+	JobStatusNew:       {},
+	JobStatusQueued:    {},
+	JobStatusRunning:   {},
+	JobStatusCompleted: {},
+	JobStatusFailed:    {},
+	JobStatusCancelled: {},
 }
