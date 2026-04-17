@@ -6,7 +6,7 @@ import (
 	st "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/status"
 )
 
-// Test for validating Locations.
+// Test for validating status values.
 func TestValidationError_ValidStatus(t *testing.T) {
 	locs := []string{"inactive", "active", "deleted", "suspended", "rejected", "draft", "closed"}
 
@@ -18,7 +18,8 @@ func TestValidationError_ValidStatus(t *testing.T) {
 	}
 }
 
-func TestValidationError_ValidProcessStatus(t *testing.T) {
+// Test for validating jobstatus values
+func TestValidationError_ValidJobStatus(t *testing.T) {
 	locs := []string{"new", "queued", "running", "completed", "failed", "cancelled"}
 
 	for _, l := range locs {
