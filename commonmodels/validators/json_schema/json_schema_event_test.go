@@ -204,7 +204,6 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if strings.Contains(e.Message, "pattern") || strings.Contains(e.Message, "format") {
 					foundM++
 				}
-				// Assert Loc and Code for all errors
 				if e.Loc != string(verr.Body) {
 					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
 				}
