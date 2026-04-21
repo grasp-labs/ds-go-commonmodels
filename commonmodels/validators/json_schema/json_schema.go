@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"strings"
 
+	ecode "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/errors"
 	verr "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -41,8 +42,8 @@ func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte) []verr.Validation
 		return []verr.ValidationError{{
 			Field:   NoneFieldError,
 			Message: "schema validator error: " + err.Error(),
-			Loc:     "json_schema_validator",
-			Code:    "validator_error",
+			Loc:     string(verr.Body),
+			Code:    ecode.ValidationFailed,
 		}}
 	}
 
@@ -60,8 +61,8 @@ func ValidateAgainstSchema(docBytes []byte, jsonSchema []byte) []verr.Validation
 		errs = append(errs, verr.ValidationError{
 			Field:   field,
 			Message: fmt.Sprintf("(%s): %s", kw, issue.Description()),
-			Loc:     "json_schema_validation",
-			Code:    kw,
+			Loc:     string(verr.Body),
+			Code:    ecode.ValidationFailed,
 		})
 	}
 	return errs
