@@ -143,7 +143,7 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 		foundF := 0
 		foundM := 0
 		for _, e := range validationErrors {
-			if e.Field == "none_field_error" {
+			if e.Field == js.NoneFieldError {
 				foundF++
 				if strings.Contains(e.Message, "anyOf") || strings.Contains(e.Message, "required") {
 					foundM++
