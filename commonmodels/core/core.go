@@ -13,7 +13,6 @@ import (
 	status "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/status"
 	types "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/types"
 	verr "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
-	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validators/email"
 )
 
 // Now returns the current time in UTC.
@@ -78,14 +77,8 @@ func (b *CoreModel) ValidateWithContext(loc string, code string, locale string) 
 	if b.CreatedBy == "" {
 		req("created_by", errC.Required)
 	}
-	if !email.IsEmailFormat(b.CreatedBy) {
-		req("created_by", errC.InvalidEmailFormat)
-	}
 	if b.ModifiedBy == "" {
 		req("modified_by", errC.Required)
-	}
-	if !email.IsEmailFormat(b.ModifiedBy) {
-		req("modified_by", errC.InvalidEmailFormat)
 	}
 	if b.CreatedAt.IsZero() {
 		req("created_at", errC.Required)

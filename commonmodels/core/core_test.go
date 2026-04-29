@@ -104,7 +104,7 @@ func TestCoreModel_Validate_Name_is_requiredand_string(t *testing.T) {
 	coreModel.Name = "test"
 }
 
-func TestCoreModel_Validate_CreatedBy_is_requiredand_string(t *testing.T) {
+func TestCoreModel_Validate_CreatedBy_is_required_and_string(t *testing.T) {
 	jsonStr := `
 	{
 	  "created_by": null
@@ -128,7 +128,7 @@ func TestCoreModel_Validate_CreatedBy_is_requiredand_string(t *testing.T) {
 	}
 	assert.True(t, exist)
 	allowed := map[string]struct{}{
-		"created_by is required.": {}, "created_by must be a valid email address.": {},
+		"created_by is required.": {},
 	}
 	_, ok := allowed[message]
 
@@ -137,7 +137,7 @@ func TestCoreModel_Validate_CreatedBy_is_requiredand_string(t *testing.T) {
 	coreModel.CreatedBy = "user@domain.com"
 }
 
-func TestCoreModel_Validate_ModifiedBy_is_required_string(t *testing.T) {
+func TestCoreModel_Validate_ModifiedBy_is_required_and_string(t *testing.T) {
 	jsonStr := `
 	{
 	  "modified_by": null
@@ -161,7 +161,7 @@ func TestCoreModel_Validate_ModifiedBy_is_required_string(t *testing.T) {
 	}
 	assert.True(t, exist)
 	allowed := map[string]struct{}{
-		"modified_by is required.": {}, "modified_by must be a valid email address.": {},
+		"modified_by is required.": {},
 	}
 	_, ok := allowed[message]
 
@@ -228,6 +228,33 @@ func TestCoreModel_Validate_ModifiedAt_is_required_timestamp(t *testing.T) {
 
 func TestManualLifeCycle_create(t *testing.T) {
 	subject := "user@domain.com"
+	issuer := "grasp-labs"
+	tenantId := uuid.MustParse("25948ccc-cf16-491e-9cd4-44d5ebb7bc54")
+
+	meta := map[string]string{"owner_id": "xyz123", "retention": "365"}
+
+	tags := map[string]string{
+		"env":       "prod",
+		"tenant_id": tenantId.String(),
+	}
+
+	c := core.CoreModel{
+		Name:     "Webhook config for X",
+		Metadata: types.JSONB[map[string]string]{Data: meta},
+		Tags:     types.JSONB[map[string]string]{Data: tags},
+		Status:   "active",
+	}
+
+	// Apply create-time defaults & audit
+	c.Create(subject, issuer, tenantId)
+	validationErrors := c.Validate()
+	if len(validationErrors) > 0 {
+		t.Fatalf("Expected 0 validationErrors, got %v", validationErrors)
+	}
+}
+
+func TestOauthAppIsValid(t *testing.T) {
+	subject := "H8k2mP9vL5rN1wZ7xQ3jT6bY4sF0gA2cD9eR1uM5iV8"
 	issuer := "grasp-labs"
 	tenantId := uuid.MustParse("25948ccc-cf16-491e-9cd4-44d5ebb7bc54")
 
