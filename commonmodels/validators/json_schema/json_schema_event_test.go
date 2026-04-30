@@ -8,8 +8,10 @@ import (
 
 	"github.com/google/uuid"
 
+	ecode "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/enum/errors"
 	events "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/kafka"
 	"github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/types"
+	verr "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validation_error"
 	js "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/validators/json_schema"
 )
 
@@ -141,10 +143,17 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 		foundF := 0
 		foundM := 0
 		for _, e := range validationErrors {
-			if e.Field == "none_field_error" {
+			if e.Field == js.NoneFieldError {
 				foundF++
 				if strings.Contains(e.Message, "anyOf") || strings.Contains(e.Message, "required") {
 					foundM++
+				}
+				// Assert Loc and Code are set correctly
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
 				}
 			}
 
@@ -168,6 +177,13 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if e.Message != "(minProperties): Must have at least 1 properties" {
 					t.Fatalf("Expected message '(minProperties): Must have at least 1 properties', got %s", e.Message)
 				}
+				// Assert Loc and Code are set correctly
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+				}
 			}
 		}
 	})
@@ -188,6 +204,12 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if strings.Contains(e.Message, "pattern") || strings.Contains(e.Message, "format") {
 					foundM++
 				}
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+				}
 			}
 
 			if e.Field == "affected_entity_uri" {
@@ -195,12 +217,26 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if strings.Contains(e.Message, "format") {
 					foundM++
 				}
+				// Assert Loc and Code for all errors
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+				}
 			}
 
 			if e.Field == "event_source_uri" {
 				foundF++
 				if strings.Contains(e.Message, "format") {
 					foundM++
+				}
+				// Assert Loc and Code for all errors
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
 				}
 			}
 
@@ -224,6 +260,13 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if strings.Contains(e.Message, "pattern") || strings.Contains(e.Message, "format") {
 					foundM++
 				}
+				// Assert Loc and Code for all errors
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+				}
 			}
 
 			if e.Field == "md5_hash" {
@@ -231,7 +274,40 @@ func TestEvent_JSONSchema_Failures(t *testing.T) {
 				if strings.Contains(e.Message, "format") {
 					foundM++
 				}
+				// Assert Loc and Code for all errors
+				if e.Loc != string(verr.Body) {
+					t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+				}
+				if e.Code != ecode.ValidationFailed {
+					t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+				}
 			}
+		}
+	})
+
+	t.Run("validator_error", func(t *testing.T) {
+		// Test with an invalid schema to trigger the validator error path
+		invalidSchema := []byte(`{invalid json`)
+		ev := newValidEvent()
+		validationErrors := js.ValidateAgainstSchema(marshal(t, ev), invalidSchema)
+
+		if len(validationErrors) != 1 {
+			t.Fatalf("Expected exactly one validation error, got %d", len(validationErrors))
+		}
+
+		e := validationErrors[0]
+		// Validator errors should have Field = NoneFieldError and proper Loc and Code
+		if e.Field != js.NoneFieldError {
+			t.Errorf("Expected Field to be %q, got %q", js.NoneFieldError, e.Field)
+		}
+		if e.Loc != string(verr.Body) {
+			t.Errorf("Expected Loc to be %q, got %q", string(verr.Body), e.Loc)
+		}
+		if e.Code != ecode.ValidationFailed {
+			t.Errorf("Expected Code to be %q, got %q", ecode.ValidationFailed, e.Code)
+		}
+		if !strings.Contains(e.Message, "schema validator error") {
+			t.Errorf("Expected message to contain 'schema validator error', got %q", e.Message)
 		}
 	})
 }
