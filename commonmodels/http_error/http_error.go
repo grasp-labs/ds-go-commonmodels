@@ -37,6 +37,7 @@ import (
 //   - RequestID:  always present, injected by middleware (never omitted).
 //   - Recoverable: (optional) indicates if the error is likely to be transient and if retrying might succeed.
 //   - RetryAfter:  (optional) seconds to wait before retrying indicating the client should wait before retrying.
+//   - ReferenceID: (optional) stable id for the conflicting or related entity (e.g. a row id on 409 Conflict).
 //
 // Internal-only:
 //   - cause:   the underlying Go error (not serialized).
@@ -47,6 +48,7 @@ type HTTPError struct {
 	RequestID   string `json:"request_id"`
 	Recoverable bool   `json:"recoverable"`
 	RetryAfter  int    `json:"retry_after"`
+	ReferenceID string `json:"reference_id,omitempty"`
 
 	cause  error
 	status int
@@ -738,5 +740,11 @@ func (e *HTTPError) WithRetry(retryAfterSeconds int) *HTTPError {
 	} else {
 		e.Recoverable = false
 	}
+	return e
+}
+
+// WithReferenceID sets ReferenceID (e.g. conflicting row id) and returns the modified error.
+func (e *HTTPError) WithReferenceID(referenceID string) *HTTPError {
+	e.ReferenceID = referenceID
 	return e
 }

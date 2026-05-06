@@ -441,6 +441,20 @@ func TestConflict_DefaultMessage(t *testing.T) {
 	}
 }
 
+func TestConflict_WithReferenceID_JSON(t *testing.T) {
+	requestID := uuid.MustParse("31ac4e2a-10a1-471d-ac7c-fd6ee13a526d").String()
+	rowID := "row-uuid-123"
+	httpErr := he.Conflict(requestID, "duplicate").WithReferenceID(rowID)
+	jsonBytes, err := json.Marshal(httpErr)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	want := `{"code":"conflict","message":"duplicate","request_id":"31ac4e2a-10a1-471d-ac7c-fd6ee13a526d","recoverable":false,"retry_after":0,"reference_id":"row-uuid-123"}`
+	if string(jsonBytes) != want {
+		t.Fatalf("got %s, want %s", string(jsonBytes), want)
+	}
+}
+
 func TestServiceUnavailable_DefaultMessage(t *testing.T) {
 	requestID := uuid.New().String()
 	httpErr := he.ServiceUnavailable(requestID, "")
