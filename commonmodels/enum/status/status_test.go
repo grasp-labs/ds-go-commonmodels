@@ -20,7 +20,7 @@ func TestValidationError_ValidStatus(t *testing.T) {
 
 // Test for validating jobstatus values
 func TestValidationError_ValidJobStatus(t *testing.T) {
-	locs := []string{"new", "queued", "running", "completed", "failed", "cancelled"}
+	locs := []string{"new", "queued", "running", "completed", "failed", "cancelled", "requested", "dispatched"}
 
 	for _, l := range locs {
 		_, ok := st.ValidJobStatus[st.JobStatus(l)]
