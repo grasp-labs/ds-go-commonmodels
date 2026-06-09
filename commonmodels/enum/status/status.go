@@ -15,12 +15,14 @@ const (
 type JobStatus string
 
 const (
-	JobStatusNew       JobStatus = "new"
-	JobStatusQueued    JobStatus = "queued"
-	JobStatusRunning   JobStatus = "running"
-	JobStatusCompleted JobStatus = "completed"
-	JobStatusFailed    JobStatus = "failed"
-	JobStatusCancelled JobStatus = "cancelled"
+	JobStatusNew        JobStatus = "new"
+	JobStatusRequested  JobStatus = "requested"
+	JobStatusDispatched JobStatus = "dispatched"
+	JobStatusQueued     JobStatus = "queued"
+	JobStatusRunning    JobStatus = "running"
+	JobStatusCompleted  JobStatus = "completed"
+	JobStatusFailed     JobStatus = "failed"
+	JobStatusCancelled  JobStatus = "cancelled"
 )
 
 // Map of statuses that can be used to check if a status is valid,
@@ -48,10 +50,12 @@ var ValidStatus = map[Status]struct{}{
 // _, ok := ValidJobStatus[s]
 // if !ok {...}
 var ValidJobStatus = map[JobStatus]struct{}{
-	JobStatusNew:       {},
-	JobStatusQueued:    {},
-	JobStatusRunning:   {},
-	JobStatusCompleted: {},
-	JobStatusFailed:    {},
-	JobStatusCancelled: {},
+	JobStatusNew:        {},
+	JobStatusRequested:  {},
+	JobStatusDispatched: {},
+	JobStatusQueued:     {},
+	JobStatusRunning:    {},
+	JobStatusCompleted:  {},
+	JobStatusFailed:     {},
+	JobStatusCancelled:  {},
 }
