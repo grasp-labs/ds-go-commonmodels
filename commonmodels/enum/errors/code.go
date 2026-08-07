@@ -15,7 +15,7 @@ package errors
 import (
 	"fmt"
 	"net/http"
-	"reflect"
+	"strings"
 )
 
 // -----------------------------------------------------------------------------
@@ -182,9 +182,9 @@ var messagesNB = map[string]string{
 	Required:                      "%s er påkrevd.",
 	InvalidEmailFormat:            "%s må være en gyldig e-postadresse.",
 	InvalidJSONFormat:             "Kroppen i forespørselen må være gyldig JSON.",
-	InvalidStatus:                 "Oppgitt statusverdi er ugyldig. Gyldige verdier inkluderer active, deleted, suspended, rejected, draft",
+	InvalidStatus:                 "Oppgitt statusverdi %s er ugyldig. Gyldige verdier inkluderer active, deleted, suspended, rejected, draft",
 	Invalid:                       "Ugyldig",
-	InvalidDataType:               "Oppgitt datatypeverdi er ugyldig. Gyldige verdier inkluderer string, int64, float64, decimal, time, datetime, bytes, uuid, map",
+	InvalidDataType:               "Oppgitt datatypeverdi %s er ugyldig. Gyldige verdier inkluderer string, int64, float64, decimal, time, datetime, bytes, uuid, map",
 	BadGateway:                    "Serveren mottok et ugyldig svar fra en ekstern tjeneste. Prøv igjen senere.",
 	OK:                            "Vellykket.",
 	Created:                       "Ressurs opprettet.",
@@ -244,9 +244,85 @@ var messagesNB = map[string]string{
 // Message catalog
 // -----------------------------------------------------------------------------
 
+const (
+	LocaleEN = "en"
+	LocaleNB = "nb"
+)
+
 var catalogs = map[string]map[string]string{
-	"en": messagesEN,
-	"nb": messagesNB,
+	LocaleEN: messagesEN,
+	LocaleNB: messagesNB,
+}
+
+// genericSubject stands in for a missing Sprintf argument, so a caller that
+// omits the field name gets a sentence instead of a raw "%s".
+var genericSubject = map[string]string{
+	LocaleEN: "This field",
+	LocaleNB: "Dette feltet",
+}
+
+// normalizeLocale maps a request locale onto a catalog key. Callers hand us
+// whatever Accept-Language negotiation produced, which is a language tag and not
+// a catalog key: "no", "nb", "nb-NO" and "nn" all mean the Norwegian catalog,
+// "en-US" means the English one. Returns "" when nothing matches, which leaves
+// the fallback decision to the caller.
+//
+// Getting this wrong is not a small mistake: a service defaulting to "no" used
+// to miss the "nb" catalog entirely and answer in English, while
+// CustomHumanMessageLocale accepted "no" and answered in Norwegian — so a single
+// validation response mixed the two languages.
+func normalizeLocale(locale string) string {
+	l := strings.ToLower(strings.TrimSpace(locale))
+	if i := strings.IndexAny(l, "-_"); i > 0 {
+		l = l[:i]
+	}
+	switch l {
+	case "no", "nb", "nn", "nob", "nno":
+		return LocaleNB
+	case "en", "eng":
+		return LocaleEN
+	default:
+		return ""
+	}
+}
+
+// countVerbs counts the fmt verbs in a template, ignoring escaped "%%".
+func countVerbs(msg string) int {
+	n := 0
+	for i := 0; i < len(msg); i++ {
+		if msg[i] != '%' {
+			continue
+		}
+		if i+1 < len(msg) && msg[i+1] == '%' {
+			i++
+			continue
+		}
+		n++
+	}
+	return n
+}
+
+// fill applies args to a template without ever leaking formatting noise into a
+// client-facing message. A template and its call sites drift — a translation
+// loses a placeholder, a caller passes a field name to a message that has none —
+// and the cost of that drift should be a slightly generic sentence, never
+// "%!(EXTRA string=memory_mb)" or a literal "%s" in front of a user.
+func fill(locale, msg string, args ...any) string {
+	n := countVerbs(msg)
+	if n == 0 {
+		return msg
+	}
+	if len(args) > n {
+		args = args[:n]
+	}
+	for len(args) < n {
+		subject, ok := genericSubject[locale]
+		if !ok {
+			subject = genericSubject[LocaleEN]
+		}
+		args = append(args, subject)
+	}
+	return fmt.Sprintf(msg, args...)
 }
 
 // HumanMessage returns a human-readable message for a machine code.
@@ -267,20 +343,24 @@ func HumanMessage(code string, args ...any) string {
 	return HumanMessageLocale("en", code, args...)
 }
 
-// HumanMessageLocale lets you choose a locale (e.g., "en", "nb").
+// HumanMessageLocale lets you choose a locale. It accepts any language tag the
+// Accept-Language negotiation produces ("en", "en-US", "no", "nb", "nb-NO",
+// "nn"); anything it does not recognise falls back to English.
 func HumanMessageLocale(locale, code string, args ...any) string {
-	cat, ok := catalogs[locale]
+	key := normalizeLocale(locale)
+	cat, ok := catalogs[key]
 	if !ok {
-		cat = messagesEN
+		key, cat = LocaleEN, messagesEN
 	}
 	msg, ok := cat[code]
 	if !ok {
-		msg = messagesEN[Internal] // safe fallback
+		// An untranslated code is still better answered in English than as a
+		// generic internal error.
+		if msg, ok = messagesEN[code]; !ok {
+			msg = messagesEN[Internal]
+		}
 	}
-	if len(args) > 0 {
-		return fmt.Sprintf(msg, args...)
-	}
-	return msg
+	return fill(key, msg, args...)
 }
 
 type CustomMessage struct {
@@ -288,20 +368,13 @@ type CustomMessage struct {
 	No string
 }
 
+// CustomHumanMessageLocale picks the translation for a locale, accepting the same
+// language tags as HumanMessageLocale so the two never disagree about what "nb"
+// or "no" means. Anything unrecognised, or a missing translation, falls back to
+// English.
 func CustomHumanMessageLocale(locale string, c CustomMessage) string {
-	opts := map[string]string{
-		"en": "En",
-		"no": "No",
-	}
-	var upperLocale string
-	upperLocale, ok := opts[locale]
-	if !ok {
-		upperLocale = "En"
-	}
-	r := reflect.ValueOf(c)
-	v := r.FieldByName(upperLocale)
-	if v.IsValid() {
-		return v.String()
+	if normalizeLocale(locale) == LocaleNB && c.No != "" {
+		return c.No
 	}
 	return c.En
 }
@@ -320,6 +393,7 @@ var statusByCode = map[string]int{
 	InvalidEmailFormat:            http.StatusBadRequest,
 	InvalidJSONFormat:             http.StatusBadRequest,
 	InvalidStatus:                 http.StatusBadRequest,
+	InvalidDataType:               http.StatusBadRequest,
 	Invalid:                       http.StatusBadRequest,
 	BadGateway:                    http.StatusBadGateway,
 	OK:                            http.StatusOK,
