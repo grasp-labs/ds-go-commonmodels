@@ -1,13 +1,31 @@
 package httperror_test
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
 	he "github.com/grasp-labs/ds-go-commonmodels/v3/commonmodels/http_error"
 )
+
+func TestFromError_ContextCanceled(t *testing.T) {
+	requestID := uuid.NewString()
+
+	httpErr := he.FromError(requestID, context.Canceled)
+
+	if httpErr.Code != "request_cancelled" {
+		t.Fatalf("expected request_cancelled code, got %q", httpErr.Code)
+	}
+	if httpErr.Status() != 499 {
+		t.Fatalf("expected status 499, got %d", httpErr.Status())
+	}
+	if !errors.Is(httpErr, context.Canceled) {
+		t.Fatal("expected context.Canceled to be preserved as the cause")
+	}
+}
 
 func TestHttpError_NotFound(t *testing.T) {
 	requestID := uuid.MustParse("31ac4e2a-10a1-471d-ac7c-fd6ee13a526d").String()
