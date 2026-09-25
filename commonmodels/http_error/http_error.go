@@ -6,6 +6,7 @@
 package httperror
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -456,6 +457,16 @@ func RequestTimeout(requestID, msg string, locale ...string) *HTTPError {
 	return NewHTTPError(requestID, errC.RequestTimeout, msg, http.StatusRequestTimeout)
 }
 
+// RequestCancelled returns a 499 Client Closed Request response.
+// Status 499 is non-standard, but is commonly used when the client cancels the request.
+func RequestCancelled(requestID, msg string, locale ...string) *HTTPError {
+	loc := GetLocale(locale...)
+	if msg == "" {
+		msg = errC.HumanMessageLocale(loc, errC.RequestCancelled)
+	}
+	return NewHTTPError(requestID, errC.RequestCancelled, msg, 499)
+}
+
 // Gone returns a 410 Gone response.
 // Locale is optional; defaults to "en".
 func Gone(requestID, msg string, locale ...string) *HTTPError {
@@ -726,6 +737,9 @@ func FromError(requestID string, err error) *HTTPError {
 	var he *HTTPError
 	if errors.As(err, &he) {
 		return he
+	}
+	if errors.Is(err, context.Canceled) {
+		return RequestCancelled(requestID, "").WithCause(err)
 	}
 	return Internal(requestID, "").WithCause(err)
 }

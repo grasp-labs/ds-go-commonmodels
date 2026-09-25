@@ -62,6 +62,7 @@ const (
 	NotAcceptable                 = "not_acceptable"
 	ProxyAuthRequired             = "proxy_auth_required"
 	RequestTimeout                = "request_timeout"
+	RequestCancelled              = "request_cancelled"
 	Gone                          = "gone"
 	LengthRequired                = "length_required"
 	PreconditionFailed            = "precondition_failed"
@@ -136,6 +137,7 @@ var messagesEN = map[string]string{
 	NotAcceptable:                 "Not acceptable.",
 	ProxyAuthRequired:             "Proxy authentication required.",
 	RequestTimeout:                "Request timeout.",
+	RequestCancelled:              "Request cancelled.",
 	Gone:                          "Resource gone.",
 	LengthRequired:                "Content length required.",
 	PreconditionFailed:            "Precondition failed.",
@@ -210,6 +212,7 @@ var messagesNB = map[string]string{
 	NotAcceptable:                 "Ikke akseptabelt.",
 	ProxyAuthRequired:             "Proxy-autentisering kreves.",
 	RequestTimeout:                "Forespørselen har tidsavbrudd.",
+	RequestCancelled:              "Forespørselen ble avbrutt.",
 	Gone:                          "Ressursen er fjernet.",
 	LengthRequired:                "Content-Length kreves.",
 	PreconditionFailed:            "Forutsetning feilet.",
@@ -420,6 +423,7 @@ var statusByCode = map[string]int{
 	NotAcceptable:                 http.StatusNotAcceptable,
 	ProxyAuthRequired:             http.StatusProxyAuthRequired,
 	RequestTimeout:                http.StatusRequestTimeout,
+	RequestCancelled:              499, // Client Closed Request (non-standard)
 	Gone:                          http.StatusGone,
 	LengthRequired:                http.StatusLengthRequired,
 	PreconditionFailed:            http.StatusPreconditionFailed,
